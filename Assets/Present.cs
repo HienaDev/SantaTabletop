@@ -1,22 +1,30 @@
 using UnityEngine;
+using DG.Tweening;
 
 public class Present : MonoBehaviour
 {
 
     [SerializeField, Range(1, 3)] private int health = 1;
     private int currentHealth;
+    public int CurrentHealth => currentHealth;
     [SerializeField] private Material health1Material;
     [SerializeField] private Material health2Material;
     [SerializeField] private Material health3Material;
 
+    private Vector3 originalScale;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        originalScale = transform.localScale;
+
         currentHealth = health;
 
         currentHealth = Random.Range(1, 4);
 
         UpdateMaterial();
+
+        PopUpAnimation();
     }
 
     // Update is called once per frame
@@ -30,6 +38,13 @@ public class Present : MonoBehaviour
 
     }
 
+    public void PopUpAnimation()
+    {
+
+        transform.localScale = Vector3.zero;
+        transform.DOScale(originalScale, 0.3f).SetEase(Ease.OutBack);
+    }
+
     public int DamagePresent()
     {
         currentHealth--;
@@ -37,14 +52,27 @@ public class Present : MonoBehaviour
         if(currentHealth > 0)
         {
             UpdateMaterial();
+            ShakePresent();
         }
-       
-        return currentHealth;
+        else
+        {
+            BlowUpPresent();
+        }
+
+            return currentHealth;
     }
 
     public void BlowUpPresent()
     {
-        Destroy(gameObject);
+        transform.DOScale(Vector3.zero, 0.3f).SetEase(Ease.InBack).OnComplete(() =>
+        {
+            Destroy(gameObject);
+        });
+    }
+
+    private void ShakePresent()
+    {
+        transform.DOShakePosition(0.7f, 0.2f, 10, 90, false, true);
     }
 
     private void UpdateMaterial()
