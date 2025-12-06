@@ -222,7 +222,7 @@ MonoBehaviour:
   gridSize: {x: 7, y: 10}
   presentPrefab: {fileID: 6843491782843126687, guid: 93573161e6429a44c956fd16602cbb3f, type: 3}
   presentHeight: 0.5
-  presentArcHeight: 2
+  presentArcHeight: 5
   presentArcSpeed: 0.1
   cellPrefab: {fileID: 2227097216169021922, guid: 202e441e8b8d4994f8abf1d8b2d6a3ac, type: 3}
   materialForFirstRowIndicator: {fileID: 2100000, guid: 26490ab108b1eaf4ab3ca288668e3598, type: 2}
@@ -529,12 +529,13 @@ MonoBehaviour:
   centerCardPosition: {fileID: 4893380700947561413}
   cardZOffset: 0.3
   initialDeck:
-  - {fileID: 6792461178538579350, guid: e83a86e46f6e9c64285da7b1eec3babb, type: 3}
   - {fileID: 8301528737591261173, guid: 4228bf06822a5e343828065e4bddf061, type: 3}
+  - {fileID: 6720630123224043042, guid: 6879f3231b79dcd45b22dec2368aa84a, type: 3}
   distanceToPlayCard: 0.5
   energyPerTurn: 3
   energyText: {fileID: 1081103484}
   endTurnButton: {fileID: 635683723}
+  DoubleCastActive: 0
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0

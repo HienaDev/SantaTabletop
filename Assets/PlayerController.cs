@@ -52,6 +52,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI energyText;
     [SerializeField] private GameObject endTurnButton;
 
+    public bool DoubleCastActive = false;
+
     private void Start()
     {
         handOriginalPosition = handParent.position;
@@ -195,6 +197,11 @@ public class PlayerController : MonoBehaviour
                 gridManager.TurnOffAllIndicatorCells();
                 bulletInstance.MoveBullet();
 
+                if(DoubleCastActive)
+                {
+                    ActivateDoubleCast(bulletInstance, currentlySelectedBullet);
+                }
+
                 bulletMoving = bulletInstance;
 
                 bulletInstance = null;
@@ -248,6 +255,37 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void ActivateDoubleCast(Bullet bullet, Bullet bulletPrefab)
+    {
+        if (DoubleCastActive)
+        {
+            DoubleCastActive = false;
+
+            Vector2Int cellPosition = bullet.CurrentPosition;
+            
+            int randomX = Random.Range(0, gridManager.GridSize.x - 1);
+            int randomY = Random.Range(0, gridManager.GridSize.y - 1);
+
+            if(randomX == cellPosition.x)
+            {
+                randomX +=1;
+            }
+            if(randomY == cellPosition.y)
+            {
+                randomY += 1;
+            }
+
+            if(!bullet.GlobalPower)
+            {
+                randomY = cellPosition.y;
+            }
+
+            bulletInstance = Instantiate(bulletPrefab, gridManager.ConvertPosition(randomX, randomY), Quaternion.identity);
+            bulletInstance.Initialize(randomX, randomY);
+            bulletInstance.MoveBullet();
+        }
+    }
+
     private void HideHand(bool hide)
     {
         if(handHidden && !hide)
@@ -257,6 +295,7 @@ public class PlayerController : MonoBehaviour
                 card.HideCard(false);
             }
             endTurnButton.SetActive(true);
+
             handHidden = false; 
             return;
         }

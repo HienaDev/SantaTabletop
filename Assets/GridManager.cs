@@ -9,6 +9,7 @@ public class GridManager : MonoBehaviour
 {
     [SerializeField] private Vector2 gridScale = new Vector2(2, 2);
     [SerializeField] private Vector2Int gridSize = new Vector2Int(7, 10);
+    public Vector2Int GridSize { get { return gridSize; } }
     [SerializeField] private Present presentPrefab;
     [SerializeField] private float presentHeight = 0.1f;
 
@@ -238,14 +239,17 @@ public class GridManager : MonoBehaviour
 
             if (randValue < presentPercentanges[wilsonHealth - wilsonCurrentHealth].x)
             {
+                Debug.Log("Rolled for 1 health present. Roll: " + randValue);
                 presentTemp.Initialize(1);
             }
-            else if (randValue < presentPercentanges[wilsonHealth - wilsonCurrentHealth].y)
+            else if (randValue < presentPercentanges[wilsonHealth - wilsonCurrentHealth].y + presentPercentanges[wilsonHealth - wilsonCurrentHealth].x)
             {
+                Debug.Log("Rolled for 2 health present. Roll: " + randValue);
                 presentTemp.Initialize(2);
             }
             else
             {
+                Debug.Log("Rolled for 3 health present. Roll: " + randValue);
                 presentTemp.Initialize(3);
             }
 

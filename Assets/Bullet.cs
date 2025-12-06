@@ -11,8 +11,11 @@ public class Bullet : MonoBehaviour
     protected Vector3 originalScale;
 
     protected Vector2Int currentPosition;
+    public Vector2Int CurrentPosition { get { return currentPosition; } }
 
     public bool stoppedActing = false;
+
+    public bool GlobalPower { get; private set; }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()

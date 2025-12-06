@@ -13,10 +13,17 @@ public class Present : MonoBehaviour
 
     private Vector3 originalScale;
 
+    [SerializeField] private Card[] commonCard;
+    [SerializeField] private Card[] godCards;
+
+    [SerializeField] private Vector3[] spawnChances;
+
+    private PlayerController playerController;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        playerController = FindAnyObjectByType<PlayerController>();
     }
 
     // Update is called once per frame
@@ -29,6 +36,7 @@ public class Present : MonoBehaviour
     {
         originalScale = transform.localScale;
         currentHealth = health;
+        this.health = health;
         UpdateMaterial();
 
         PopUpAnimation();
@@ -36,7 +44,6 @@ public class Present : MonoBehaviour
 
     public void PopUpAnimation()
     {
-
         transform.localScale = Vector3.zero;
         transform.DOScale(originalScale, 0.3f).SetEase(Ease.OutBack);
     }
@@ -52,10 +59,34 @@ public class Present : MonoBehaviour
         }
         else
         {
+            GiveRewards();
             BlowUpPresent();
         }
 
-            return currentHealth;
+        return currentHealth;
+    }
+
+    public void GiveRewards()
+    {
+        float roll = Random.value;
+
+        Debug.Log("Present roll: " + roll); 
+
+        if (roll <= spawnChances[health - 1].x)
+        {
+            // Coal
+        }
+        else if (roll <= spawnChances[health - 1].x + spawnChances[health - 1].y)
+        {
+            // Spawn common card
+            int index = Random.Range(0, commonCard.Length);
+            playerController.AddCardToDeck(commonCard[index]);
+        }
+        else
+        {
+            int index = Random.Range(0, godCards.Length);
+            playerController.AddCardToDeck(godCards[index]);
+        }
     }
 
     public void BlowUpPresent()

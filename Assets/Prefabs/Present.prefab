@@ -103,3 +103,12 @@ MonoBehaviour:
   health1Material: {fileID: 2100000, guid: a805ebf314c56b9419accd5d40b25c1e, type: 2}
   health2Material: {fileID: 2100000, guid: e92141eaf2f82c346946681bb9e829b0, type: 2}
   health3Material: {fileID: 2100000, guid: 9628d0e68b2203a4eaf334484abebc5a, type: 2}
+  commonCard:
+  - {fileID: 6792461178538579350, guid: e83a86e46f6e9c64285da7b1eec3babb, type: 3}
+  godCards:
+  - {fileID: 8301528737591261173, guid: 4228bf06822a5e343828065e4bddf061, type: 3}
+  - {fileID: 6720630123224043042, guid: 6879f3231b79dcd45b22dec2368aa84a, type: 3}
+  spawnChances:
+  - {x: 0.3, y: 0.5, z: 0.2}
+  - {x: 0.2, y: 0.4, z: 0.4}
+  - {x: 0, y: 0.3, z: 0.7}
