@@ -16,15 +16,7 @@ public class Present : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        originalScale = transform.localScale;
-
-        currentHealth = health;
-
-        currentHealth = Random.Range(1, 4);
-
-        UpdateMaterial();
-
-        PopUpAnimation();
+        
     }
 
     // Update is called once per frame
@@ -35,7 +27,11 @@ public class Present : MonoBehaviour
 
     public void Initialize(int health)
     {
+        originalScale = transform.localScale;
+        currentHealth = health;
+        UpdateMaterial();
 
+        PopUpAnimation();
     }
 
     public void PopUpAnimation()

@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Bullet currentlySelectedBullet;
 
     private Bullet bulletInstance;
+    private Bullet bulletMoving;
 
     private GridManager gridManager;
 
@@ -36,7 +37,8 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private Card[] initialDeck;
     private List<Card> deck = new List<Card>();
-    private List<Card> discardDeck = new List<Card>();
+    private int currentCardIndex = 0;
+
 
     private Card currentlyHoveredCard;
     private Vector3 draggedStartSpawnPosition;
@@ -48,19 +50,19 @@ public class PlayerController : MonoBehaviour
     private int currentEnergy;
 
     [SerializeField] private TextMeshProUGUI energyText;
+    [SerializeField] private GameObject endTurnButton;
 
     private void Start()
     {
         handOriginalPosition = handParent.position;
         currentlyDraggedCard = null;
         deck = new List<Card>(initialDeck);
-        discardDeck = new List<Card>();
 
         currentEnergy = energyPerTurn;
 
         gridManager = FindAnyObjectByType<GridManager>();
 
-        StartTurn();
+       
     }
 
     public void StartTurn()
@@ -68,6 +70,7 @@ public class PlayerController : MonoBehaviour
         currentEnergy = energyPerTurn;
         UpdateUICost();
         DrawCards(drawPerTurn);
+        endTurnButton.SetActive(true);
     }
 
     public void EndTurn()
@@ -80,31 +83,37 @@ public class PlayerController : MonoBehaviour
     {
         for (int i = 0; i < numberOfCards; i++)
         {
-            if (deck.Count == 0 && discardDeck.Count > 0)
+            if(currentCardIndex >= deck.Count)
             {
                 ShuffleDiscardDeck();
-                DrawCards(numberOfCards - i);
-                break;
             }
-            else if (deck.Count == 0 && discardDeck.Count == 0)
-                break;
 
-            int randomIndex = Random.Range(0, deck.Count);
-            Card drawnCard = deck[randomIndex];
-
-            deck.RemoveAt(randomIndex);
-            discardDeck.Add(drawnCard);
+            Card drawnCard = deck[currentCardIndex];
 
             AddCardToHand(drawnCard);
+
+            currentCardIndex++;
         }
         ArrangeCardsInHand();
     }
 
+    public void AddCardToDeck(Card card)
+    {
+        deck.Add(card);
+    }
+
+    public void RemoveCardFromDeck(Card card)
+    {
+        if (deck.Contains(card))
+        {
+            deck.Remove(card);
+        }
+    }
+
     public void ShuffleDiscardDeck()
     {
-        deck.AddRange(discardDeck);
-        discardDeck.Clear();
         ShuffleDeck();
+        currentCardIndex = 0;
     }
 
     private void ShuffleDeck()
@@ -121,9 +130,21 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
 
-        if(currentlySelectedBullet != null)
+        if(currentlySelectedBullet != null || gridManager.WilsonDoingStuff)
         {
             HideHand(true);
+        }
+        else if(bulletMoving != null)
+        {
+            if(!bulletMoving.stoppedActing)
+            {
+                HideHand(true);
+            }
+            else
+            {
+                bulletMoving = null;
+                HideHand(false);
+            }
         }
         else
         {
@@ -172,8 +193,12 @@ public class PlayerController : MonoBehaviour
             {
                 gridManager.TurnOffAllIndicatorCells();
                 bulletInstance.MoveBullet();
+
+                bulletMoving = bulletInstance;
+
                 bulletInstance = null;
                 currentlySelectedBullet = null;
+                
             }
 
             if(currentlyDraggedCard == null && currentlyHoveredCard != null)
@@ -375,8 +400,7 @@ public class PlayerController : MonoBehaviour
         if (playerHand.Contains(card))
         {
             playerHand.Remove(card);
-            discardDeck.Add(card);
-            Destroy(card.gameObject);
+            card.DestroyCard();
         }
     }
 

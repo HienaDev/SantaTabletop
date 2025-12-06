@@ -5,11 +5,14 @@ public class Bullet : MonoBehaviour
 {
 
     protected bool moving = false;
+    public bool Moving { get { return moving; } }
 
     protected GridManager gridManager;
     protected Vector3 originalScale;
 
     protected Vector2Int currentPosition;
+
+    public bool stoppedActing = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
@@ -37,11 +40,13 @@ public class Bullet : MonoBehaviour
 
     public virtual void MoveBullet()
     {
+        moving = true;
         // Implement bullet movement logic here
     }
 
     public virtual void OnStopMoveAction()
     {
+        stoppedActing = true;
         // Implement logic for when the bullet stops moving
     }
 
@@ -53,8 +58,8 @@ public class Bullet : MonoBehaviour
             {
                 CheckIfHitWilson(currentPosition.x);
             }
-
-                Destroy(gameObject);
+            stoppedActing = true;
+            Destroy(gameObject);
         });
 
     }

@@ -2,6 +2,8 @@ using UnityEngine;
 using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+
 
 public class GridManager : MonoBehaviour
 {
@@ -10,7 +12,12 @@ public class GridManager : MonoBehaviour
     [SerializeField] private Present presentPrefab;
     [SerializeField] private float presentHeight = 0.1f;
 
+    [SerializeField] private float presentArcHeight = 10f;
+    [SerializeField] private float presentArcSpeed = 5f;
+
     [SerializeField] private IndicatorCell cellPrefab;
+
+    [SerializeField] private int initialRowsToFill = 5;
 
     private IndicatorCell[,] cellArray;
     private GameObject[,] gridArray;
@@ -24,9 +31,21 @@ public class GridManager : MonoBehaviour
 
     private Coroutine cellIndicatorCoroutine;
 
+    [SerializeField] private int wilsonHealth = 3;
+    private int wilsonCurrentHealth;
+    [SerializeField] private Vector3[] presentPercentanges;
+    public bool WilsonDoingStuff { get; private set; }
+
+    private PlayerController playerController;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    IEnumerator Start()
+    void Start()
     {
+
+        playerController = FindAnyObjectByType<PlayerController>();
+
+        wilsonCurrentHealth = wilsonHealth;
+
         if (gridArray == null)
             gridArray = new GameObject[gridSize.x, gridSize.y];
 
@@ -35,55 +54,70 @@ public class GridManager : MonoBehaviour
 
         SpawnIndicatorCells();
 
-        GenerateRandomPresentFirstLine();
-
-        yield return new WaitForSeconds(0.35f);
-
-        MoveAllObjectsDown();
-
-        yield return new WaitForSeconds(0.35f);
-
-        GenerateRandomPresentFirstLine();
-
-        yield return new WaitForSeconds(0.35f);
-
-        MoveAllObjectsDown();
-
-        yield return new WaitForSeconds(0.35f);
-
-        GenerateRandomPresentFirstLine();
-
-        yield return new WaitForSeconds(0.35f);
-
-        MoveAllObjectsDown();
-
-        yield return new WaitForSeconds(0.35f);
-
-        GenerateRandomPresentFirstLine();
-
-        yield return new WaitForSeconds(0.35f);
-
-        MoveAllObjectsDown();
-
-        yield return new WaitForSeconds(0.35f);
-
-        GenerateRandomPresentFirstLine();
-
-        yield return new WaitForSeconds(0.35f);
-
-        //MoveAllObjectsDown();
-
-        //yield return new WaitForSeconds(0.35f);
-
-        //GenerateRandomPresentFirstLine();
-
-        //SpawnBullet(testFilipe, 3, 9);
+        SetUp(true);
     }
 
     // Update is called once per frame
     void Update()
     {
+
+    }
+
+
+    public void SetUp(bool firstRound = false)
+    {
+        StartCoroutine(SetUpCR(firstRound));
+    }
+
+    public IEnumerator SetUpCR(bool firstRound = false)
+    {
+        WilsonDoingStuff = true;
+        ClearGrid();
+
+        yield return new WaitForSeconds(0.6f);
+
+        for (int i = 0; i < initialRowsToFill; i++)
+        {
+
+            if(firstRound && initialRowsToFill - i == 1)
+            {
+                break;
+            }
+
+            GenerateRandomPresentFirstLine();
+            yield return new WaitForSeconds(1.5f);
+            if(i < initialRowsToFill - 1)
+                MoveAllObjectsDown();
+            yield return new WaitForSeconds(0.35f);
+        }
+
+        if(firstRound)
+        {
+            NewRound();
+        }
+    }
+
+    public void SpawnNewRow()
+    {
+        StartCoroutine(SpawnNewRowCR());
+    }
+
+    public IEnumerator SpawnNewRowCR()
+    {
+        WilsonDoingStuff = true;
+        GenerateRandomPresentFirstLine();
+        yield return new WaitForSeconds(0.65f);
+        MoveAllObjectsDown();
+        yield return new WaitForSeconds(0.21f);
+        WilsonDoingStuff = false;
+        playerController.StartTurn();
         
+    }
+
+    public void NewRound()
+    {
+        MoveWilson(Random.Range(0, gridSize.x));
+        SpawnNewRow();
     }
 
     private void SpawnIndicatorCells()
@@ -98,7 +132,7 @@ public class GridManager : MonoBehaviour
 
                 cellTemp.transform.parent = gameObject.transform;
 
-                if(y == gridSize.y - 1)
+                if (y == gridSize.y - 1)
                 {
                     int maskValue = interectableMask.value;
 
@@ -123,7 +157,7 @@ public class GridManager : MonoBehaviour
 
     public void TurnOffAllIndicatorCells()
     {
-        if(cellIndicatorCoroutine != null)
+        if (cellIndicatorCoroutine != null)
         {
             StopCoroutine(cellIndicatorCoroutine);
         }
@@ -152,18 +186,47 @@ public class GridManager : MonoBehaviour
 
     private void GenerateRandomPresentFirstLine()
     {
+        StartCoroutine(GenerateRandomPresentFirstLineCR());
+    }
+
+    private IEnumerator GenerateRandomPresentFirstLineCR()
+    {
         for (int x = 0; x < gridSize.x; x++)
         {
-            if(Random.value > 0.5f)
+            if (Random.value > 0.5f)
                 continue;
 
             Vector3 spawnPosition = ConvertPosition(x, 0, presentHeight);
-            Present presentTemp = Instantiate(presentPrefab, spawnPosition, Quaternion.identity);
+            Present presentTemp = Instantiate(presentPrefab, wilson.transform.position, Quaternion.identity);
+
+            float randValue = Random.value;
+
+            if (randValue < presentPercentanges[wilsonHealth - wilsonCurrentHealth].x)
+            {
+                presentTemp.Initialize(1);
+            }
+            else if (randValue < presentPercentanges[wilsonHealth - wilsonCurrentHealth].y)
+            {
+                presentTemp.Initialize(2);
+            }
+            else
+            {
+                presentTemp.Initialize(3);
+            }
+
+            Debug.Log("Rolled random value: " + randValue);
+
+            presentTemp.transform.DOJump(
+            endValue: spawnPosition, // The target world position
+            jumpPower: presentArcHeight,      // The height of the arc's peak
+            numJumps: 1,        // The number of arcs (keep at 1 for mortar)
+            duration: presentArcSpeed         // The total time of the jump
+            ).SetEase(Ease.InOutSine);
 
             AddObjectToGrid(x, 0, presentTemp.gameObject);
-        }
 
-        MoveWilson(0);// Random.Range(0, gridSize.x));
+            yield return new WaitForSeconds(0.05f);
+        }
     }
 
     private void MoveWilson(int x)
@@ -181,12 +244,31 @@ public class GridManager : MonoBehaviour
                 gridArray[x, y] = gridArray[x, y - 1];
                 if (gridArray[x, y] != null)
                 {
-                    Debug.Log("Trying to move object at: " + gridArray[x, y]);
                     gridArray[x, y].transform.DOMove(ConvertPosition(x, y, presentHeight), 0.2f).SetEase(Ease.InOutSine);
                 }
             }
             gridArray[x, 0] = null;
         }
+    }
+
+    private void ClearGrid()
+    {
+        for (int x = 0; x < gridSize.x; x++)
+        {
+            for (int y = gridSize.y - 1; y > 0; y--)
+            {
+                if (gridArray[x, y] != null)
+                {
+                    gridArray[x, y].transform.DOMoveY(gridArray[x, y].transform.position.y - 2f, 0.5f).SetEase(Ease.InOutSine).OnComplete(() =>
+                    {
+                        Destroy(gridArray[x, y]);
+                        gridArray[x, y] = null;
+                    });
+                }
+            }
+        }
+
+        gridArray = new GameObject[gridSize.x, gridSize.y];
     }
 
     public GameObject GetObjectAtPosition(int x, int y)
@@ -233,10 +315,15 @@ public class GridManager : MonoBehaviour
 
     public void CheckIfHitWilson(int x)
     {
-        if(x == wilsonPositionX)
+        if (x == wilsonPositionX)
         {
             Debug.Log("Hit Wilson!");
-            wilson.transform.DOPunchPosition(new Vector3(0, 0, -0.2f), 0.5f, 10, 1);
+            wilson.transform.DOPunchPosition(new Vector3(0, 0, -0.2f), 0.5f, 10, 1).OnComplete(() =>
+            {
+                // Additional logic on punch complete
+                SetUp();
+            });
+
         }
     }
 }

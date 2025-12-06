@@ -263,7 +263,7 @@ MonoBehaviour:
   titleText: {fileID: 502636451519735606}
   descriptionText: {fileID: 8630410252702736711}
   manaIcons:
-  - {fileID: 0}
+  - {fileID: 21300000, guid: 8c24f27c49fb26640aa63e8a80f0a734, type: 3}
   - {fileID: 21300000, guid: f7c4287cee3906e458fd18dc40aaf1d6, type: 3}
   - {fileID: 21300000, guid: d711ea4a5790c6d4a956f23544bc9af5, type: 3}
   - {fileID: 21300000, guid: 3eefe9e29e29ac548b74d7766d3dec21, type: 3}
