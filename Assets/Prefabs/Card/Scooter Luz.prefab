@@ -343,6 +343,7 @@ MonoBehaviour:
 
     Bounces on the walls and runs over any red presents'
   placed: 0
+  GlobalPower: 0
   elfBulletPrefab: {fileID: 6138101787412444201, guid: 2d2e70246c687954f927c297c4b5f814, type: 3}
 --- !u!1 &4460251577140545362
 GameObject:
@@ -1071,7 +1072,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 2, y: 1}
+  m_SizeDelta: {x: 1.25, y: 0.93}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2886675418762154721
 CanvasRenderer:
@@ -1093,7 +1094,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 2100000, guid: e4fb1a21154f3084e90ff80507fe1534, type: 2}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}

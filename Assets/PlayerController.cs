@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using DG.Tweening;
 using TMPro;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
@@ -26,7 +27,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private Transform handParent;
     private Vector3 handOriginalPosition;
-    private bool handHidden = false;    
+    private bool handHidden = false;
 
     [SerializeField] private int drawPerTurn = 3;
     [SerializeField] private Card cardPrefab;
@@ -64,7 +65,7 @@ public class PlayerController : MonoBehaviour
 
         gridManager = FindAnyObjectByType<GridManager>();
 
-       
+
     }
 
     public void StartTurn()
@@ -79,14 +80,14 @@ public class PlayerController : MonoBehaviour
     public void EndTurn()
     {
         ClearHand();
-        
+
     }
 
     public void DrawCards(int numberOfCards)
     {
         for (int i = 0; i < numberOfCards; i++)
         {
-            if(currentCardIndex >= deck.Count)
+            if (currentCardIndex >= deck.Count)
             {
                 ShuffleDiscardDeck();
             }
@@ -133,13 +134,13 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
 
-        if(currentlySelectedBullet != null || gridManager.WilsonDoingStuff)
+        if (currentlySelectedBullet != null || gridManager.WilsonDoingStuff)
         {
             HideHand(true);
         }
-        else if(bulletMoving != null)
+        else if (bulletMoving != null)
         {
-            if(!bulletMoving.stoppedActing)
+            if (!bulletMoving.stoppedActing)
             {
                 HideHand(true);
             }
@@ -190,14 +191,14 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if(Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0))
         {
             if (bulletInstance != null)
             {
                 gridManager.TurnOffAllIndicatorCells();
                 bulletInstance.MoveBullet();
 
-                if(DoubleCastActive)
+                if (DoubleCastActive)
                 {
                     ActivateDoubleCast(bulletInstance, currentlySelectedBullet);
                 }
@@ -209,7 +210,7 @@ public class PlayerController : MonoBehaviour
                 gridManager.TurnOffFirstRowIndicator();
             }
 
-            if(currentlyDraggedCard == null && currentlyHoveredCard != null)
+            if (currentlyDraggedCard == null && currentlyHoveredCard != null)
             {
                 currentlyDraggedCard = currentlyHoveredCard;
                 draggedStartSpawnPosition = currentlyDraggedCard.transform.position;
@@ -217,7 +218,7 @@ public class PlayerController : MonoBehaviour
         }
 
 
-        if(currentlyDraggedCard != null && Input.GetMouseButton(0))
+        if (currentlyDraggedCard != null && Input.GetMouseButton(0))
             MoveDraggedCardWithMouse();
 
 
@@ -225,9 +226,9 @@ public class PlayerController : MonoBehaviour
         {
             if (currentlyDraggedCard != null)
             {
-                if(Vector3.Distance(currentlyDraggedCard.transform.position, draggedStartSpawnPosition) >= distanceToPlayCard)
+                if (Vector3.Distance(currentlyDraggedCard.transform.position, draggedStartSpawnPosition) >= distanceToPlayCard)
                 {
-                    if(currentlyDraggedCard.Cost > currentEnergy)
+                    if (currentlyDraggedCard.Cost > currentEnergy)
                     {
                         ReturnToPosition(draggedStartSpawnPosition);
                         currentlyDraggedCard.UnreadyToUse();
@@ -235,6 +236,7 @@ public class PlayerController : MonoBehaviour
                         return;
                     }
                     gridManager.TurnOnFirstRowIndicator();
+
                     PlayCard();
                     RemoveCardFromHand(currentlyDraggedCard);
                 }
@@ -245,14 +247,31 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if(currentlyDraggedCard != null && Input.GetKeyDown(KeyCode.Escape))
+        if (currentlyDraggedCard != null && Input.GetKeyDown(KeyCode.Escape))
         {
-            
+
             ReturnToPosition(draggedStartSpawnPosition);
             currentlyDraggedCard.UnreadyToUse();
             currentlyDraggedCard = null;
             currentlyHoveredCard = null;
         }
+    }
+
+    private void ActivateDoubleCast(Card card)
+    {
+        if (DoubleCastActive)
+        {
+            DoubleCastActive = false;
+
+            StartCoroutine(ActivateDoubleCastCR(card, 0.5f));
+        }
+    }
+
+    private IEnumerator ActivateDoubleCastCR(Card card, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        card.UseEffect();
     }
 
     private void ActivateDoubleCast(Bullet bullet, Bullet bulletPrefab)
@@ -262,20 +281,20 @@ public class PlayerController : MonoBehaviour
             DoubleCastActive = false;
 
             Vector2Int cellPosition = bullet.CurrentPosition;
-            
+
             int randomX = Random.Range(0, gridManager.GridSize.x - 1);
             int randomY = Random.Range(0, gridManager.GridSize.y - 1);
 
-            if(randomX == cellPosition.x)
+            if (randomX == cellPosition.x)
             {
-                randomX +=1;
+                randomX += 1;
             }
-            if(randomY == cellPosition.y)
+            if (randomY == cellPosition.y)
             {
                 randomY += 1;
             }
 
-            if(!bullet.GlobalPower)
+            if (!bullet.GlobalPower)
             {
                 randomY = cellPosition.y;
             }
@@ -283,12 +302,14 @@ public class PlayerController : MonoBehaviour
             bulletInstance = Instantiate(bulletPrefab, gridManager.ConvertPosition(randomX, randomY), Quaternion.identity);
             bulletInstance.Initialize(randomX, randomY);
             bulletInstance.MoveBullet();
+
+            gridManager.TurnOffAllIndicatorCells();
         }
     }
 
     private void HideHand(bool hide)
     {
-        if(handHidden && !hide)
+        if (handHidden && !hide)
         {
             foreach (Card card in playerHand)
             {
@@ -296,7 +317,7 @@ public class PlayerController : MonoBehaviour
             }
             endTurnButton.SetActive(true);
 
-            handHidden = false; 
+            handHidden = false;
             return;
         }
         else if (!handHidden && hide)
@@ -351,6 +372,12 @@ public class PlayerController : MonoBehaviour
     private void PlayCard()
     {
         currentlyDraggedCard.UseEffect();
+
+        if (DoubleCastActive && currentlyDraggedCard.GlobalPower)
+        {
+            ActivateDoubleCast(currentlyDraggedCard);
+        }
+
         currentEnergy -= currentlyDraggedCard.Cost;
         UpdateUICost();
     }
@@ -386,7 +413,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if(currentlySelectedBullet == null)
+        if (currentlySelectedBullet == null)
             if (hoveredObject.TryGetComponent<Card>(out Card card))
             {
                 if (card.placed)
@@ -394,7 +421,7 @@ public class PlayerController : MonoBehaviour
                     currentlyHoveredCard = card;
                     card.EnterHover();
                 }
-                
+
             }
     }
 
@@ -404,9 +431,9 @@ public class PlayerController : MonoBehaviour
     /// <param name="unhoveredObject">The GameObject the mouse just left.</param>
     private void HandleObjectUnhovered(GameObject unhoveredObject)
     {
-        if(unhoveredObject.TryGetComponent<Card>(out Card card))
+        if (unhoveredObject.TryGetComponent<Card>(out Card card))
         {
-            if(card.placed)
+            if (card.placed)
             {
                 currentlyHoveredCard = null;
                 card.ExitHover();
