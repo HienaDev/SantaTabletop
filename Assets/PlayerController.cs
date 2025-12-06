@@ -1,4 +1,7 @@
+using NUnit.Framework;
 using UnityEngine;
+using System.Collections.Generic;
+using DG.Tweening;
 
 public class PlayerController : MonoBehaviour
 {
@@ -19,9 +22,24 @@ public class PlayerController : MonoBehaviour
 
     private GridManager gridManager;
 
+    [SerializeField] private int playerHandSize = 3;
+    [SerializeField] private Card cardPrefab;
+    private List<Card> playerHand = new List<Card>();
+    [SerializeField] private Transform centerCardPosition;
+
+    [SerializeField] private float cardZOffset = 0.5f;
+
+
     private void Start()
     {
         gridManager = FindAnyObjectByType<GridManager>();
+
+        for (int i = 0; i < playerHandSize; i++)
+        {
+            AddCardToHand(cardPrefab);
+        }
+
+        ArrangeCardsInHand();
     }
 
     void Update()
@@ -78,14 +96,6 @@ public class PlayerController : MonoBehaviour
     /// <param name="hoveredObject">The GameObject the mouse is currently over.</param>
     private void HandleObjectHovered(GameObject hoveredObject)
     {
-        Debug.Log($"Mouse is now hovering over: {hoveredObject.name}");
-
-        // Example: Change the object's color to indicate hover state (requires a Renderer)
-        Renderer renderer = hoveredObject.GetComponent<Renderer>();
-        if (renderer != null)
-        {
-            renderer.material.color = Color.yellow;
-        }
 
         if (hoveredObject.TryGetComponent<IndicatorCell>(out IndicatorCell cell))
         {
@@ -100,6 +110,12 @@ public class PlayerController : MonoBehaviour
                 currentBullet.Initialize(cell.Position.x, cell.Position.y);
             }
         }
+
+        if (hoveredObject.TryGetComponent<Card>(out Card card))
+        {
+            if (card.placed)
+                card.EnterHover();
+        }
     }
 
     /// <summary>
@@ -108,13 +124,10 @@ public class PlayerController : MonoBehaviour
     /// <param name="unhoveredObject">The GameObject the mouse just left.</param>
     private void HandleObjectUnhovered(GameObject unhoveredObject)
     {
-        Debug.Log($"Mouse stopped hovering over: {unhoveredObject.name}");
-
-        // Example: Reset the object's color (assuming the original color was white)
-        Renderer renderer = unhoveredObject.GetComponent<Renderer>();
-        if (renderer != null)
+        if(unhoveredObject.TryGetComponent<Card>(out Card card))
         {
-            renderer.material.color = Color.white;
+            if(card.placed)
+                card.ExitHover();
         }
     }
 
@@ -123,4 +136,42 @@ public class PlayerController : MonoBehaviour
         currentlySelectedCard = card;
         Debug.Log("Selected card: " + card.name);
     }
+
+    public void AddCardToHand(Card card)
+    {
+        Card newCard = Instantiate(card, centerCardPosition.position, Quaternion.identity);
+        playerHand.Add(newCard);
+    }
+
+    public void ArrangeCardsInHand()
+    {
+        for (int i = 0; i < playerHand.Count; i++)
+        {
+            float zOffset = (i - (playerHand.Count - 1) / 2f) * cardZOffset;
+            Vector3 targetPosition = centerCardPosition.position + new Vector3(0, i * 0.02f, zOffset);
+            playerHand[i].transform.eulerAngles = centerCardPosition.eulerAngles;
+            playerHand[i].transform.localEulerAngles += new Vector3(0, (i - (playerHand.Count - 1) / 2f) * 2f, 0f);
+            playerHand[i].MoveCardToPosition(targetPosition, 5f);
+        }
+    }
+
+    public void RemoveCardFromHand(Card card)
+    {
+        if (playerHand.Contains(card))
+        {
+            playerHand.Remove(card);
+            Destroy(card.gameObject);
+            ArrangeCardsInHand();
+        }
+    }
+
+    public void ClearHand()
+    {
+        foreach (Card card in playerHand)
+        {
+            Destroy(card.gameObject);
+        }
+        playerHand.Clear();
+    }
+
 }

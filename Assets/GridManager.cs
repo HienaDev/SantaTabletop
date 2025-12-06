@@ -96,6 +96,8 @@ public class GridManager : MonoBehaviour
                 IndicatorCell cellTemp = Instantiate(cellPrefab, spawnPosition, Quaternion.identity);
                 cellTemp.transform.position = new Vector3(cellTemp.transform.position.x, 0.51f, cellTemp.transform.position.z);
 
+                cellTemp.transform.parent = gameObject.transform;
+
                 if(y == gridSize.y - 1)
                 {
                     int maskValue = interectableMask.value;
@@ -132,7 +134,7 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    public void TurnOnIndicators(List<Vector2Int> positions)
+    public void TurnOnPathIndicators(List<Vector2Int> positions)
     {
         TurnOffAllIndicatorCells();
 

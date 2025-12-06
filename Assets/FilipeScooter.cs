@@ -179,7 +179,7 @@ public class FilipeScooter : Bullet
             currentPos = nextPos;
         }
 
-        gridManager.TurnOnIndicators(path);
+        gridManager.TurnOnPathIndicators(path);
     }
 
 
