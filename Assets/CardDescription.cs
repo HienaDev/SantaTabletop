@@ -1,15 +1,20 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CardDescription : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI cost;
+    [SerializeField] private Image cardImage;
+    [SerializeField] private Image cost;
     [SerializeField] private TextMeshProUGUI titleText;
     [SerializeField] private TextMeshProUGUI descriptionText;
 
-    public void SetCardDescription(int cardCost, string title, string description)
+    [SerializeField] private Sprite[] manaIcons;
+
+    public void SetCardDescription(int cardCost, Sprite image, string title, string description)
     {
-        cost.text = cardCost.ToString();
+        cost.sprite = manaIcons[cardCost];
+        cardImage.sprite = image;
         titleText.text = title;
         descriptionText.text = description;
     }

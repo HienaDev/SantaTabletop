@@ -4,6 +4,8 @@ using DG.Tweening;
 public class Card : MonoBehaviour
 {
     [SerializeField, Range(0, 3)] protected int cost;
+    public int Cost { get { return cost; } }
+    [SerializeField] private Sprite cardImage;
     protected TAG_Outline tagOutline;
     protected TAG_OutlineSelected tagOutlineSelected;
 
@@ -24,7 +26,7 @@ public class Card : MonoBehaviour
     {
         playerController = FindAnyObjectByType<PlayerController>();
 
-        GetComponentInChildren<CardDescription>().SetCardDescription(cost, cardName, description);
+        GetComponentInChildren<CardDescription>().SetCardDescription(cost, cardImage, cardName, description);
 
         tagOutline = GetComponentInChildren<TAG_Outline>();
         tagOutlineSelected = GetComponentInChildren<TAG_OutlineSelected>();

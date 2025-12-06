@@ -66,7 +66,7 @@ public class PlayerController : MonoBehaviour
     public void StartTurn()
     {
         currentEnergy = energyPerTurn;
-        energyText.text = currentEnergy.ToString() + "/" + energyPerTurn;
+        UpdateUICost();
         DrawCards(drawPerTurn);
     }
 
@@ -194,6 +194,13 @@ public class PlayerController : MonoBehaviour
             {
                 if(Vector3.Distance(currentlyDraggedCard.transform.position, draggedStartSpawnPosition) >= distanceToPlayCard)
                 {
+                    if(currentlyDraggedCard.Cost > currentEnergy)
+                    {
+                        ReturnToPosition(draggedStartSpawnPosition);
+                        currentlyDraggedCard.UnreadyToUse();
+                        currentlyDraggedCard = null;
+                        return;
+                    }
                     PlayCard();
                     RemoveCardFromHand(currentlyDraggedCard);
                 }
@@ -275,6 +282,13 @@ public class PlayerController : MonoBehaviour
     private void PlayCard()
     {
         currentlyDraggedCard.UseEffect();
+        currentEnergy -= currentlyDraggedCard.Cost;
+        UpdateUICost();
+    }
+
+    private void UpdateUICost()
+    {
+        energyText.text = currentEnergy.ToString() + "/" + energyPerTurn;
     }
 
     public void ReturnToPosition(Vector3 targetPosition)
