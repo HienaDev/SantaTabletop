@@ -7,6 +7,9 @@ public class FilipeScooter : Bullet
     [SerializeField] private bool rightDiagonal;
     public override void MoveBullet()
     {
+
+        moving = true;
+
         // Implement specific movement logic for FilipeScooter here
 
         Vector2Int leftDiagonalPos = currentPosition + new Vector2Int(-1, -1);
@@ -115,6 +118,10 @@ public class FilipeScooter : Bullet
 
     public override void DisplayPath()
     {
+
+        if (moving)
+            return;
+
         Vector2Int currentPos = currentPosition;
         bool currentDirection = rightDiagonal;
 
@@ -155,23 +162,15 @@ public class FilipeScooter : Bullet
 
             if (objAtNextPos != null && objAtNextPos.TryGetComponent<Present>(out Present present))
             {
-                // CRITICAL LOGIC: If the Present has MORE THAN 1 HP, it survives the hit.
-                // Since this bullet does only 1 point of damage (implied by your MoveBullet logic),
-                // the path prediction must stop if the health is > 1.
+                path.Add(nextPos);
 
                 // Assuming Present.Health is the property/field holding the current HP
                 if (present.CurrentHealth > 1)
                 {
-                    // Path stops before damaging the present (since it would survive)
-                    // We DO NOT add this cell to the path display, as the bullet would explode.
+ 
                     break;
                 }
-                else
-                {
-                    // Health is 1 or less: The bullet will destroy the Present and keep moving.
-                    // The path continues *through* this cell.
-                    path.Add(nextPos);
-                }
+
             }
 
             // 4. If nothing blocks it, add the position to the path and move on.

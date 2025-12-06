@@ -2,6 +2,7 @@ using NUnit.Framework;
 using UnityEngine;
 using System.Collections.Generic;
 using DG.Tweening;
+using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
@@ -16,34 +17,119 @@ public class PlayerController : MonoBehaviour
     // Stores the last object we were hovering over
     private GameObject lastHoveredObject = null;
 
-    [SerializeField] private Bullet currentlySelectedCard;
+    [SerializeField] private Bullet currentlySelectedBullet;
 
-    private Bullet currentBullet;
+    private Bullet bulletInstance;
 
     private GridManager gridManager;
 
-    [SerializeField] private int playerHandSize = 3;
+    [SerializeField] private Transform handParent;
+    private Vector3 handOriginalPosition;
+    private bool handHidden = false;    
+
+    [SerializeField] private int drawPerTurn = 3;
     [SerializeField] private Card cardPrefab;
     private List<Card> playerHand = new List<Card>();
     [SerializeField] private Transform centerCardPosition;
 
     [SerializeField] private float cardZOffset = 0.5f;
 
+    [SerializeField] private Card[] initialDeck;
+    private List<Card> deck = new List<Card>();
+    private List<Card> discardDeck = new List<Card>();
+
+    private Card currentlyHoveredCard;
+    private Vector3 draggedStartSpawnPosition;
+    private Card currentlyDraggedCard;
+
+    [SerializeField] private float distanceToPlayCard = 1f;
+
+    [SerializeField] private int energyPerTurn = 3;
+    private int currentEnergy;
+
+    [SerializeField] private TextMeshProUGUI energyText;
 
     private void Start()
     {
+        handOriginalPosition = handParent.position;
+        currentlyDraggedCard = null;
+        deck = new List<Card>(initialDeck);
+        discardDeck = new List<Card>();
+
+        currentEnergy = energyPerTurn;
+
         gridManager = FindAnyObjectByType<GridManager>();
 
-        for (int i = 0; i < playerHandSize; i++)
-        {
-            AddCardToHand(cardPrefab);
-        }
+        StartTurn();
+    }
 
+    public void StartTurn()
+    {
+        currentEnergy = energyPerTurn;
+        energyText.text = currentEnergy.ToString() + "/" + energyPerTurn;
+        DrawCards(drawPerTurn);
+    }
+
+    public void EndTurn()
+    {
+        ClearHand();
+        
+    }
+
+    public void DrawCards(int numberOfCards)
+    {
+        for (int i = 0; i < numberOfCards; i++)
+        {
+            if (deck.Count == 0 && discardDeck.Count > 0)
+            {
+                ShuffleDiscardDeck();
+                DrawCards(numberOfCards - i);
+                break;
+            }
+            else if (deck.Count == 0 && discardDeck.Count == 0)
+                break;
+
+            int randomIndex = Random.Range(0, deck.Count);
+            Card drawnCard = deck[randomIndex];
+
+            deck.RemoveAt(randomIndex);
+            discardDeck.Add(drawnCard);
+
+            AddCardToHand(drawnCard);
+        }
         ArrangeCardsInHand();
+    }
+
+    public void ShuffleDiscardDeck()
+    {
+        deck.AddRange(discardDeck);
+        discardDeck.Clear();
+        ShuffleDeck();
+    }
+
+    private void ShuffleDeck()
+    {
+        for (int i = 0; i < deck.Count; i++)
+        {
+            Card temp = deck[i];
+            int randomIndex = Random.Range(i, deck.Count);
+            deck[i] = deck[randomIndex];
+            deck[randomIndex] = temp;
+        }
     }
 
     void Update()
     {
+
+        if(currentlySelectedBullet != null)
+        {
+            HideHand(true);
+        }
+        else
+        {
+            HideHand(false);
+        }
+
         // 1. Create a ray from the camera through the mouse position
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
@@ -82,12 +168,118 @@ public class PlayerController : MonoBehaviour
 
         if(Input.GetMouseButtonDown(0))
         {
-            if (currentBullet != null)
+            if (bulletInstance != null)
             {
-                currentBullet.MoveBullet();
-                currentBullet = null;
+                gridManager.TurnOffAllIndicatorCells();
+                bulletInstance.MoveBullet();
+                bulletInstance = null;
+                currentlySelectedBullet = null;
+            }
+
+            if(currentlyDraggedCard == null && currentlyHoveredCard != null)
+            {
+                currentlyDraggedCard = currentlyHoveredCard;
+                draggedStartSpawnPosition = currentlyDraggedCard.transform.position;
             }
         }
+
+
+        if(currentlyDraggedCard != null && Input.GetMouseButton(0))
+            MoveDraggedCardWithMouse();
+
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            if (currentlyDraggedCard != null)
+            {
+                if(Vector3.Distance(currentlyDraggedCard.transform.position, draggedStartSpawnPosition) >= distanceToPlayCard)
+                {
+                    PlayCard();
+                    RemoveCardFromHand(currentlyDraggedCard);
+                }
+                else
+                    ReturnToPosition(draggedStartSpawnPosition);
+
+                currentlyDraggedCard = null;
+            }
+        }
+
+        if(currentlyDraggedCard != null && Input.GetKeyDown(KeyCode.Escape))
+        {
+            ReturnToPosition(draggedStartSpawnPosition);
+            currentlyDraggedCard.UnreadyToUse();
+            currentlyDraggedCard = null;
+            currentlyHoveredCard = null;
+        }
+    }
+
+    private void HideHand(bool hide)
+    {
+        if(handHidden && !hide)
+        {
+            foreach (Card card in playerHand)
+            {
+                card.HideCard(false);
+            }
+            handHidden = false; 
+            return;
+        }
+        else if (!handHidden && hide)
+        {
+            foreach (Card card in playerHand)
+            {
+                card.HideCard(true);
+            }
+            handHidden = true;
+            return;
+        }
+
+    }
+
+    private void MoveDraggedCardWithMouse()
+    {
+        // The normal vector of the local XZ plane is the object's local Y-axis (transform.up).
+        Vector3 planeNormal = currentlyDraggedCard.transform.up;
+
+        // The point the plane passes through is the object's current world position.
+        Vector3 planeWorldPoint = currentlyDraggedCard.transform.position + transform.TransformVector(Vector3.zero);
+
+        // 2. Define the local XZ plane in world space.
+        Plane localPlane = new Plane(planeNormal, planeWorldPoint);
+
+        // 3. Create a ray from the camera through the mouse position.
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        float distance;
+
+        // 4. Check for intersection between the ray and the local plane.
+        if (localPlane.Raycast(ray, out distance))
+        {
+            // 5. Get the exact world point of the intersection.
+            Vector3 targetPoint = ray.GetPoint(distance);
+
+            // 6. Move the object to that position.
+            currentlyDraggedCard.transform.position = targetPoint;
+        }
+
+        if (Vector3.Distance(currentlyDraggedCard.transform.position, draggedStartSpawnPosition) >= distanceToPlayCard)
+        {
+            currentlyDraggedCard.ReadyToUse();
+        }
+        else
+        {
+            currentlyDraggedCard.UnreadyToUse();
+        }
+    }
+
+    private void PlayCard()
+    {
+        currentlyDraggedCard.UseEffect();
+    }
+
+    public void ReturnToPosition(Vector3 targetPosition)
+    {
+        currentlyDraggedCard.MoveCardToPosition(targetPosition, 5f, false);
     }
 
     /// <summary>
@@ -97,25 +289,30 @@ public class PlayerController : MonoBehaviour
     private void HandleObjectHovered(GameObject hoveredObject)
     {
 
-        if (hoveredObject.TryGetComponent<IndicatorCell>(out IndicatorCell cell))
+        if (currentlySelectedBullet != null && hoveredObject.TryGetComponent<IndicatorCell>(out IndicatorCell cell))
         {
-            if (currentBullet == null)
+            if (bulletInstance == null)
             {
-                currentBullet = Instantiate(currentlySelectedCard, gridManager.ConvertPosition(cell.Position.x, cell.Position.y), Quaternion.identity);
-                currentBullet.Initialize(cell.Position.x, cell.Position.y);
+                bulletInstance = Instantiate(currentlySelectedBullet, gridManager.ConvertPosition(cell.Position.x, cell.Position.y), Quaternion.identity);
+                bulletInstance.Initialize(cell.Position.x, cell.Position.y);
             }
             else
             {
-                currentBullet.transform.position = gridManager.ConvertPosition(cell.Position.x, cell.Position.y);
-                currentBullet.Initialize(cell.Position.x, cell.Position.y);
+                bulletInstance.transform.position = gridManager.ConvertPosition(cell.Position.x, cell.Position.y);
+                bulletInstance.Initialize(cell.Position.x, cell.Position.y);
             }
         }
 
-        if (hoveredObject.TryGetComponent<Card>(out Card card))
-        {
-            if (card.placed)
-                card.EnterHover();
-        }
+        if(currentlySelectedBullet == null)
+            if (hoveredObject.TryGetComponent<Card>(out Card card))
+            {
+                if (card.placed)
+                {
+                    currentlyHoveredCard = card;
+                    card.EnterHover();
+                }
+                
+            }
     }
 
     /// <summary>
@@ -127,19 +324,23 @@ public class PlayerController : MonoBehaviour
         if(unhoveredObject.TryGetComponent<Card>(out Card card))
         {
             if(card.placed)
+            {
+                currentlyHoveredCard = null;
                 card.ExitHover();
+            }
         }
     }
 
     public void SelectCard(Bullet card)
     {
-        currentlySelectedCard = card;
+        currentlySelectedBullet = card;
         Debug.Log("Selected card: " + card.name);
     }
 
     public void AddCardToHand(Card card)
     {
         Card newCard = Instantiate(card, centerCardPosition.position, Quaternion.identity);
+        newCard.transform.parent = handParent;
         playerHand.Add(newCard);
     }
 
@@ -160,8 +361,8 @@ public class PlayerController : MonoBehaviour
         if (playerHand.Contains(card))
         {
             playerHand.Remove(card);
+            discardDeck.Add(card);
             Destroy(card.gameObject);
-            ArrangeCardsInHand();
         }
     }
 
@@ -169,7 +370,7 @@ public class PlayerController : MonoBehaviour
     {
         foreach (Card card in playerHand)
         {
-            Destroy(card.gameObject);
+            card.DestroyCard();
         }
         playerHand.Clear();
     }

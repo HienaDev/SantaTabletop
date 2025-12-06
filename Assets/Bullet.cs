@@ -3,6 +3,9 @@ using DG.Tweening;
 
 public class Bullet : MonoBehaviour
 {
+
+    protected bool moving = false;
+
     protected GridManager gridManager;
     protected Vector3 originalScale;
 
