@@ -225,6 +225,7 @@ MonoBehaviour:
   presentArcHeight: 2
   presentArcSpeed: 0.1
   cellPrefab: {fileID: 2227097216169021922, guid: 202e441e8b8d4994f8abf1d8b2d6a3ac, type: 3}
+  materialForFirstRowIndicator: {fileID: 2100000, guid: 26490ab108b1eaf4ab3ca288668e3598, type: 2}
   initialRowsToFill: 2
   testFilipe: {fileID: 6138101787412444201, guid: 2d2e70246c687954f927c297c4b5f814, type: 3}
   wilson: {fileID: 1144298501}
@@ -529,7 +530,7 @@ MonoBehaviour:
   cardZOffset: 0.3
   initialDeck:
   - {fileID: 6792461178538579350, guid: e83a86e46f6e9c64285da7b1eec3babb, type: 3}
-  - {fileID: 6530930242184195005, guid: c72ef84b2deaedc46a62bb01cb65cfae, type: 3}
+  - {fileID: 8301528737591261173, guid: 4228bf06822a5e343828065e4bddf061, type: 3}
   distanceToPlayCard: 0.5
   energyPerTurn: 3
   energyText: {fileID: 1081103484}

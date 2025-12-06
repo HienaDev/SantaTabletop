@@ -16,4 +16,8 @@ public class IndicatorCell : MonoBehaviour
         meshObject.SetActive(state);
     }
 
+    public void SetMaterial(Material material)
+    {
+        meshObject.GetComponent<Renderer>().material = material;
+    }
 }

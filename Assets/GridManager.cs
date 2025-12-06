@@ -16,6 +16,7 @@ public class GridManager : MonoBehaviour
     [SerializeField] private float presentArcSpeed = 5f;
 
     [SerializeField] private IndicatorCell cellPrefab;
+    [SerializeField] private Material materialForFirstRowIndicator;
 
     [SerializeField] private int initialRowsToFill = 5;
 
@@ -37,6 +38,8 @@ public class GridManager : MonoBehaviour
     public bool WilsonDoingStuff { get; private set; }
 
     private PlayerController playerController;
+
+    private int currentTurn = 0;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -110,6 +113,7 @@ public class GridManager : MonoBehaviour
         MoveAllObjectsDown();
         yield return new WaitForSeconds(0.21f);
         WilsonDoingStuff = false;
+        currentTurn++;
         playerController.StartTurn();
         
     }
@@ -138,6 +142,8 @@ public class GridManager : MonoBehaviour
 
                     int layerIndex = (int)Mathf.Log(maskValue, 2);
 
+                    cellTemp.SetMaterial(materialForFirstRowIndicator);
+
                     cellTemp.gameObject.layer = layerIndex;
                 }
 
@@ -148,11 +154,29 @@ public class GridManager : MonoBehaviour
         }
 
         TurnOffAllIndicatorCells();
+        TurnOffFirstRowIndicator();
     }
 
     public void TurnOnCellIndicator(int x, int y)
     {
         cellArray[x, y].ToggleIndicator(true);
+    }
+
+    public void TurnOnFirstRowIndicator()
+    {
+        for (int x = 0; x < gridSize.x; x++)
+        {
+            cellArray[x, gridSize.y - 1].ToggleIndicator(true);
+
+        }
+    }
+
+    public void TurnOffFirstRowIndicator()
+    {
+        for (int x = 0; x < gridSize.x; x++)
+        {
+            cellArray[x, gridSize.y - 1].ToggleIndicator(false);
+        }
     }
 
     public void TurnOffAllIndicatorCells()
@@ -164,6 +188,10 @@ public class GridManager : MonoBehaviour
 
         foreach (IndicatorCell cell in cellArray)
         {
+            if(cell.Position.y == gridSize.y - 1)
+            {
+                continue;
+            }
             cell.ToggleIndicator(false);
         }
     }
@@ -177,8 +205,15 @@ public class GridManager : MonoBehaviour
 
     public IEnumerator TurnOnIndicatorsCR(List<Vector2Int> positions, float delay = 0.05f)
     {
+
+        
+
         foreach (Vector2Int pos in positions)
         {
+            if(pos.y == gridSize.y - 1)
+            {
+                continue;
+            }
             cellArray[pos.x, pos.y].ToggleIndicator(true);
             yield return new WaitForSeconds(delay);
         }
@@ -321,9 +356,34 @@ public class GridManager : MonoBehaviour
             wilson.transform.DOPunchPosition(new Vector3(0, 0, -0.2f), 0.5f, 10, 1).OnComplete(() =>
             {
                 // Additional logic on punch complete
-                SetUp();
+                wilsonCurrentHealth--;
+                if(wilsonCurrentHealth <= 0)
+                {
+                    Debug.Log("Wilson has been defeated!");
+                    GameOver();
+                }
+                else
+                {
+                    Debug.Log("Wilson's current health: " + wilsonCurrentHealth);
+                    SetUp(true);
+                }
+                
             });
 
+        }
+
+    }
+
+    public void GameOver(bool win = true)
+    {
+        Debug.Log("Game Over!");
+        if(win)
+        {
+            Debug.Log("You Win!");
+        }
+        else
+        {
+            Debug.Log("You Lose!");
         }
     }
 }

@@ -69,6 +69,7 @@ public class PlayerController : MonoBehaviour
     {
         currentEnergy = energyPerTurn;
         UpdateUICost();
+        ClearHand();
         DrawCards(drawPerTurn);
         endTurnButton.SetActive(true);
     }
@@ -198,7 +199,7 @@ public class PlayerController : MonoBehaviour
 
                 bulletInstance = null;
                 currentlySelectedBullet = null;
-                
+                gridManager.TurnOffFirstRowIndicator();
             }
 
             if(currentlyDraggedCard == null && currentlyHoveredCard != null)
@@ -226,6 +227,7 @@ public class PlayerController : MonoBehaviour
                         currentlyDraggedCard = null;
                         return;
                     }
+                    gridManager.TurnOnFirstRowIndicator();
                     PlayCard();
                     RemoveCardFromHand(currentlyDraggedCard);
                 }
@@ -238,6 +240,7 @@ public class PlayerController : MonoBehaviour
 
         if(currentlyDraggedCard != null && Input.GetKeyDown(KeyCode.Escape))
         {
+            
             ReturnToPosition(draggedStartSpawnPosition);
             currentlyDraggedCard.UnreadyToUse();
             currentlyDraggedCard = null;
@@ -253,6 +256,7 @@ public class PlayerController : MonoBehaviour
             {
                 card.HideCard(false);
             }
+            endTurnButton.SetActive(true);
             handHidden = false; 
             return;
         }
@@ -262,6 +266,7 @@ public class PlayerController : MonoBehaviour
             {
                 card.HideCard(true);
             }
+            endTurnButton.SetActive(false);
             handHidden = true;
             return;
         }
