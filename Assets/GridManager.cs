@@ -164,7 +164,6 @@ public class GridManager : MonoBehaviour
 
     public void NewRound()
     {
-        wilsonLogic.CountShotDown();
         MoveWilson(Random.Range(0, gridSize.x));
         SpawnNewRow();
     }

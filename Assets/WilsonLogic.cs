@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 
@@ -34,15 +35,19 @@ public class WilsonLogic : MonoBehaviour
 
         shotTextChance.text = $"{1}/{currentShots}\n" + (1f / currentShots * 100).ToString("F2") + "%";
 
-        if (shotCoundown <= 0)
+        if (shotCoundown <= 1)
         {
             if(!isStunned)
                 Shoot();
 
             shotCoundown = 3;
+
+            return;
         }
 
         isStunned = false;
+
+        gridManager.SpawnNewRow();
     }
 
     public void StunWilson()
@@ -75,7 +80,13 @@ public class WilsonLogic : MonoBehaviour
         {
             Debug.Log("Click! Wilson spared santa.");
             currentShots--; // Decrease the number of remaining shots
+            gridManager.SpawnNewRow();
             return false; // Indicate that Wilson did not shoot himself
         }
+    }
+
+    private void CameraToWilson()
+    {
+
     }
 }
