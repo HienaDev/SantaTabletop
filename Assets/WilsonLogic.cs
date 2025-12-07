@@ -1,6 +1,8 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using DG.Tweening;
+using GLTFast.Schema;
 
 public class WilsonLogic : MonoBehaviour
 {
@@ -17,6 +19,13 @@ public class WilsonLogic : MonoBehaviour
 
     private bool isStunned = false;
 
+    [SerializeField] private Transform cameraAnchorPlaying;
+    [SerializeField] private Transform cameraAnchorWilsonShooting;
+    [SerializeField] private Transform cameraAnchorWilsonLever;
+    [SerializeField] private Transform mainCam;
+
+    [SerializeField] private Animator leverAnimator;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -27,27 +36,40 @@ public class WilsonLogic : MonoBehaviour
     public void CountShotDown()
     {
 
-        shotCountdown.gameObject.SetActive(true);
-        shotTextChance.gameObject.SetActive(true);
-
-        shotCoundown--;
-        shotCountdown.text = "Countdown to SHOOT!\n" + shotCoundown.ToString();
-
-        shotTextChance.text = $"{1}/{currentShots}\n" + (1f / currentShots * 100).ToString("F2") + "%";
-
-        if (shotCoundown <= 1)
+        mainCam.DOMove(cameraAnchorWilsonShooting.position, 1.5f).SetEase(Ease.InOutSine);
+        mainCam.DORotateQuaternion(cameraAnchorWilsonShooting.rotation, 1.5f).SetEase(Ease.InOutSine).OnComplete(() =>
         {
-            if(!isStunned)
-                Shoot();
+            shotCountdown.gameObject.SetActive(true);
+            shotTextChance.gameObject.SetActive(true);
 
-            shotCoundown = 3;
+            DOVirtual.DelayedCall(1f, () =>
+            {
+                shotCoundown--;
+                shotCountdown.text = "Countdown to SHOOT!\n" + shotCoundown.ToString();
 
-            return;
-        }
+                shotTextChance.text = $"{1}/{currentShots}\n" + (1f / currentShots * 100).ToString("F2") + "%";
 
-        isStunned = false;
+                if (shotCoundown <= 1)
+                {
+                    if (!isStunned)
+                        Shoot();
 
-        gridManager.SpawnNewRow();
+                    shotCoundown = 3;
+
+                    return;
+                }
+
+                
+
+                isStunned = false;
+
+                ReturnCamera();
+            });
+
+
+        });
+
+        
     }
 
     public void StunWilson()
@@ -55,7 +77,7 @@ public class WilsonLogic : MonoBehaviour
         isStunned = true;
     }
 
-    public bool Shoot(bool countDown = true)
+    public bool Shoot(bool countDown = true, int currentCountdown = -1)
     {
         int bulletChoice = Random.Range(0, currentShots);
 
@@ -69,20 +91,55 @@ public class WilsonLogic : MonoBehaviour
             Debug.Log("Shot because presents destroyed");
         }
 
-        if (bulletChoice == 0)
+        bool gameOver = false;
+
+        DOVirtual.DelayedCall(1f, () =>
         {
-            Debug.Log("Bang! Wilson shot santa.");
-            currentShots = maxShots;
-            gridManager.GameOver(false);
-            return true; // Indicate that Wilson killed Santa
-        }
-        else
+            if (bulletChoice == 0)
+            {
+                Debug.Log("Bang! Wilson shot santa.");
+                currentShots = maxShots;
+                gridManager.GameOver(false);
+                gameOver = true; // Indicate that Wilson killed Santa
+            }
+            else
+            {
+                Debug.Log("Click! Wilson spared santa.");
+                currentShots--; // Decrease the number of remaining shots
+                
+                gameOver =  false; // Indicate that Wilson did not shoot himself
+            }
+
+            ReturnCamera(gameOver);
+        });
+
+        return gameOver;
+    }
+
+    public void ReturnCamera(bool gameOver = false)
+    {
+        DOVirtual.DelayedCall(1f, () =>
         {
-            Debug.Log("Click! Wilson spared santa.");
-            currentShots--; // Decrease the number of remaining shots
-            gridManager.SpawnNewRow();
-            return false; // Indicate that Wilson did not shoot himself
-        }
+            mainCam.DOMove(cameraAnchorWilsonLever.position, 1.5f).SetEase(Ease.InOutSine);
+            mainCam.DORotateQuaternion(cameraAnchorWilsonLever.rotation, 1.5f).SetEase(Ease.InOutSine).OnComplete(() =>
+            {
+                leverAnimator.SetTrigger("PullLever");
+
+
+                DOVirtual.DelayedCall(1f, () =>
+                {
+                    if (!gameOver)
+                        gridManager.SpawnNewRow();
+
+                    mainCam.DOMove(cameraAnchorPlaying.position, 1.5f).SetEase(Ease.InOutSine);
+                    mainCam.DORotateQuaternion(cameraAnchorPlaying.rotation, 1.5f).SetEase(Ease.InOutSine).OnComplete(() =>
+                    {
+                        shotCountdown.gameObject.SetActive(false);
+                        shotTextChance.gameObject.SetActive(false);
+                    });
+                });
+            });
+        });
     }
 
     private void CameraToWilson()
