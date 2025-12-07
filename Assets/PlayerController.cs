@@ -32,6 +32,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private int drawPerTurn = 3;
     [SerializeField] private Card cardPrefab;
     private List<Card> playerHand = new List<Card>();
+    public List<Card> PlayerHand { get { return playerHand; } }
     [SerializeField] private Transform centerCardPosition;
 
     [SerializeField] private float cardZOffset = 0.5f;
@@ -125,10 +126,18 @@ public class PlayerController : MonoBehaviour
 
     public void RemoveCardFromDeck(Card card)
     {
-        if (deck.Contains(card))
+        Debug.Log("Removing card from deck: " + card.cardName);
+
+        Card[] cardsToRemove = deck.FindAll(c => c.cardName == card.cardName).ToArray();
+
+        deck.RemoveAll(c => c.cardName == card.cardName);
+
+        foreach (Card c in cardsToRemove)
         {
-            deck.Remove(card);
+            Debug.Log("Wants to remove: " + c.cardName);
+
         }
+
     }
 
     public void ShuffleDiscardDeck()

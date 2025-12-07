@@ -239,6 +239,23 @@ public class GridManager : MonoBehaviour
         }
     }
 
+    public void DamageAllPresentsInCollumn(int collumn)
+    {
+        for (int y = 0; y < gridSize.y; y++)
+        {
+            GameObject obj = gridArray[collumn, y];
+            if (obj != null && obj.TryGetComponent(out Present present))
+            {
+                present.DamagePresent();
+            }
+        }
+
+        if(wilsonPositionX == collumn)
+        {
+            wilsonLogic.StunWilson();
+        }
+    }
+
     public void TurnOnPathIndicators(List<Vector2Int> positions)
     {
         TurnOffAllIndicatorCells();
