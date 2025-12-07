@@ -6,6 +6,8 @@ public class IndicatorCell : MonoBehaviour
 
     public Vector2Int Position { get; private set; }
 
+    public bool isFirstRow = false;
+
     public void SetPosition(int x, int y)
     {
         Position = new Vector2Int(x, y);

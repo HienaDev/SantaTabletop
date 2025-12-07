@@ -691,7 +691,10 @@ MonoBehaviour:
   cardName: Bugs, King of Elves
   description: '"All Hail the King!":
 
-    Elves cost 0 and deal double damage! HOORAH!'
+    Elves cost 0 and deal double damage! HOORAH!
+
+    <b>DOES
+    NOT STACK</b>'
   placed: 0
   GlobalPower: 1
 --- !u!1 &6698295860533480350

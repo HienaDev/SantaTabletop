@@ -515,6 +515,8 @@ public class PlayerController : MonoBehaviour
             playerHand.Remove(card);
             card.DestroyCard();
         }
+
+        ArrangeCardsInHand();
     }
 
     public void ClearHand()

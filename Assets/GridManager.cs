@@ -46,6 +46,8 @@ public class GridManager : MonoBehaviour
 
     private WilsonLogic wilsonLogic;
 
+    public bool fachadaDebuff = false;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -270,10 +272,17 @@ public class GridManager : MonoBehaviour
 
         foreach (Vector2Int pos in positions)
         {
-            if(pos.y == gridSize.y - 1)
+            Debug.Log(" - Turning on indicator at: " + pos);
+            if (pos.y == gridSize.y - 1)
             {
                 continue;
             }
+
+            if (CheckIfPositionOutsideGrid(pos.x, pos.y))
+            {
+                continue;
+            }
+
             cellArray[pos.x, pos.y].ToggleIndicator(true);
             yield return new WaitForSeconds(delay);
         }
@@ -289,6 +298,10 @@ public class GridManager : MonoBehaviour
         float initialChance = 0.35f;
         for (int x = 0; x < gridSize.x; x++)
         {
+
+            if (fachadaDebuff)
+                continue;
+
             if (Random.value > initialChance)
             {
                 Debug.Log("No present spawned at column " + x);
@@ -331,6 +344,8 @@ public class GridManager : MonoBehaviour
 
             yield return new WaitForSeconds(0.05f);
         }
+
+        fachadaDebuff = false;
     }
 
     private void MoveWilson(int x, bool pushed = false)
@@ -413,6 +428,10 @@ public class GridManager : MonoBehaviour
 
     public GameObject GetObjectAtPosition(int x, int y)
     {
+        if(CheckIfPositionOutsideGrid(x, y))
+        {
+            return null;
+        }
         return gridArray[x, y];
     }
 
