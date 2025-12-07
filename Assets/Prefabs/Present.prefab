@@ -105,10 +105,18 @@ MonoBehaviour:
   health3Material: {fileID: 2100000, guid: 9628d0e68b2203a4eaf334484abebc5a, type: 2}
   commonCard:
   - {fileID: 6792461178538579350, guid: e83a86e46f6e9c64285da7b1eec3babb, type: 3}
+  - {fileID: 3374310435707573499, guid: e8b445f56bcf40f40a3b6f5aaa8a2d27, type: 3}
+  - {fileID: 4157371717402085253, guid: e257ebe719b61e8418848dfd75e89cc9, type: 3}
   godCards:
   - {fileID: 8301528737591261173, guid: 4228bf06822a5e343828065e4bddf061, type: 3}
   - {fileID: 6720630123224043042, guid: 6879f3231b79dcd45b22dec2368aa84a, type: 3}
+  - {fileID: 2901771564856310509, guid: 4ae909a936f56b844a85dd288f1a88f6, type: 3}
+  - {fileID: 2227034866792489451, guid: 001720a7a20dae04fb4e959dffcef5c8, type: 3}
+  - {fileID: 1446583869420106139, guid: 9e8a926bd4797c840a1dae7107edb0a2, type: 3}
   spawnChances:
   - {x: 0.3, y: 0.5, z: 0.2}
   - {x: 0.2, y: 0.4, z: 0.4}
   - {x: 0, y: 0.3, z: 0.7}
+  coalPrefab: {fileID: 8764468297967926028, guid: f1bb674edf74ba542af8d5ae97516055, type: 3}
+  isCoal: 0
+  wonCardPrefab: {fileID: 8541029687729587282, guid: b293f7db4b3769b47b63acaec1fb7689, type: 3}

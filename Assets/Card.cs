@@ -6,6 +6,7 @@ public class Card : MonoBehaviour
     [SerializeField, Range(0, 3)] protected int cost;
     public int Cost { get { return cost; } }
     [SerializeField] private Sprite cardImage;
+    public Sprite CardImage { get { return cardImage; } }
     protected TAG_Outline tagOutline;
     protected TAG_OutlineSelected tagOutlineSelected;
 
@@ -20,6 +21,7 @@ public class Card : MonoBehaviour
     public bool placed = false;
 
     protected PlayerController playerController;
+    protected GridManager gridManager;
 
     public bool GlobalPower = false;
 
@@ -27,6 +29,7 @@ public class Card : MonoBehaviour
     void Start()
     {
         playerController = FindAnyObjectByType<PlayerController>();
+        gridManager = FindAnyObjectByType<GridManager>();
 
         GetComponentInChildren<CardDescription>().SetCardDescription(cost, cardImage, cardName, description);
 

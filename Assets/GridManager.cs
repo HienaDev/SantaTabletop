@@ -3,6 +3,7 @@ using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using UnityEditor.XR;
 
 
 public class GridManager : MonoBehaviour
@@ -23,6 +24,7 @@ public class GridManager : MonoBehaviour
 
     private IndicatorCell[,] cellArray;
     private GameObject[,] gridArray;
+    public GameObject[,] GridArray { get { return gridArray; } }
 
     [SerializeField] private Bullet testFilipe;
 
@@ -42,10 +44,12 @@ public class GridManager : MonoBehaviour
 
     private int currentTurn = 0;
 
+    private WilsonLogic wilsonLogic;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
+        wilsonLogic = FindAnyObjectByType<WilsonLogic>();
         playerController = FindAnyObjectByType<PlayerController>();
 
         wilsonCurrentHealth = wilsonHealth;
@@ -89,10 +93,10 @@ public class GridManager : MonoBehaviour
             }
 
             GenerateRandomPresentFirstLine();
-            yield return new WaitForSeconds(1.5f);
+            yield return new WaitForSeconds(0.8f);
             if(i < initialRowsToFill - 1)
                 MoveAllObjectsDown();
-            yield return new WaitForSeconds(0.35f);
+            yield return new WaitForSeconds(0.25f);
         }
 
         if(firstRound)
@@ -121,6 +125,7 @@ public class GridManager : MonoBehaviour
 
     public void NewRound()
     {
+        wilsonLogic.CountShotDown();
         MoveWilson(Random.Range(0, gridSize.x));
         SpawnNewRow();
     }
@@ -227,10 +232,16 @@ public class GridManager : MonoBehaviour
 
     private IEnumerator GenerateRandomPresentFirstLineCR()
     {
+        float initialChance = 0.5f;
         for (int x = 0; x < gridSize.x; x++)
         {
-            if (Random.value > 0.5f)
+            if (Random.value > initialChance)
+            {
+                Debug.Log("No present spawned at column " + x);
+                initialChance += 0.1f;
                 continue;
+            }
+                
 
             Vector3 spawnPosition = ConvertPosition(x, 0, presentHeight);
             Present presentTemp = Instantiate(presentPrefab, wilson.transform.position, Quaternion.identity);
@@ -240,17 +251,17 @@ public class GridManager : MonoBehaviour
             if (randValue < presentPercentanges[wilsonHealth - wilsonCurrentHealth].x)
             {
                 Debug.Log("Rolled for 1 health present. Roll: " + randValue);
-                presentTemp.Initialize(1);
+                presentTemp.Initialize(1, new Vector2Int(x, 0));
             }
             else if (randValue < presentPercentanges[wilsonHealth - wilsonCurrentHealth].y + presentPercentanges[wilsonHealth - wilsonCurrentHealth].x)
             {
                 Debug.Log("Rolled for 2 health present. Roll: " + randValue);
-                presentTemp.Initialize(2);
+                presentTemp.Initialize(2, new Vector2Int(x, 0));
             }
             else
             {
                 Debug.Log("Rolled for 3 health present. Roll: " + randValue);
-                presentTemp.Initialize(3);
+                presentTemp.Initialize(3, new Vector2Int(x, 0));
             }
 
             Debug.Log("Rolled random value: " + randValue);
@@ -268,9 +279,13 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    private void MoveWilson(int x)
+    private void MoveWilson(int x, bool pushed = false)
     {
-        wilson.transform.DOMove(ConvertPosition(x, -1), 0.3f).SetEase(Ease.InOutSine);
+        if (pushed)
+            wilson.transform.DOMove(ConvertPosition(x, -1), 0.3f).SetEase(Ease.InOutElastic);
+        else
+            wilson.transform.DOMove(ConvertPosition(x, -1), 0.3f).SetEase(Ease.OutBack, overshoot: 4f);
+
         wilsonPositionX = x;
     }
 
@@ -284,6 +299,11 @@ public class GridManager : MonoBehaviour
                 if (gridArray[x, y] != null)
                 {
                     gridArray[x, y].transform.DOMove(ConvertPosition(x, y, presentHeight), 0.2f).SetEase(Ease.InOutSine);
+
+                    if(gridArray[x, y].TryGetComponent<Present>(out Present present))
+                    {
+                        present.PushPositionDown();
+                    }
                 }
             }
             gridArray[x, 0] = null;
@@ -389,5 +409,22 @@ public class GridManager : MonoBehaviour
         {
             Debug.Log("You Lose!");
         }
+    }
+
+    public void PushWilson(bool left)
+    {
+        //if(wilsonPositionX == 0 && left)
+        //{
+        //    return;
+        //}
+
+        //if(wilsonPositionX == gridSize.x - 1 && !left)
+        //{
+        //    return;
+        //}
+
+        int newX = wilsonPositionX + (left ? -1 : 1);
+        newX = Mathf.Clamp(newX, 0, gridSize.x - 1);
+        MoveWilson(newX, true);
     }
 }

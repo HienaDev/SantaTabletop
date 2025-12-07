@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7277057036420112174}
   - component: {fileID: 6138101787412444201}
   m_Layer: 0
-  m_Name: Filipe Luz Scooter
+  m_Name: Filipe Luz Scooter Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -99,4 +99,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4e1f37a3348cae478964e6d5e0f4226, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rightDiagonal: 1
+  stoppedActing: 0
+  rightDiagonal: 0

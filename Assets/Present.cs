@@ -4,6 +4,8 @@ using DG.Tweening;
 public class Present : MonoBehaviour
 {
 
+    private Vector2Int gridPosition;
+
     [SerializeField, Range(1, 3)] private int health = 1;
     private int currentHealth;
     public int CurrentHealth => currentHealth;
@@ -20,6 +22,12 @@ public class Present : MonoBehaviour
 
     private PlayerController playerController;
 
+    [SerializeField] private Present coalPrefab;
+
+    [SerializeField] private bool isCoal = false;
+
+    [SerializeField] private SpriteRenderer wonCardPrefab;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -32,9 +40,19 @@ public class Present : MonoBehaviour
         
     }
 
-    public void Initialize(int health)
+    public void Initialize(int health, Vector2Int pos)
     {
         originalScale = transform.localScale;
+        gridPosition = pos;
+
+        if (isCoal)
+        {
+
+            this.health = 1;
+            currentHealth = 1;
+            PopUpAnimation();
+            return;
+        }
         currentHealth = health;
         this.health = health;
         UpdateMaterial();
@@ -59,7 +77,9 @@ public class Present : MonoBehaviour
         }
         else
         {
-            GiveRewards();
+            if(!isCoal)
+                GiveRewards();
+
             BlowUpPresent();
         }
 
@@ -75,24 +95,43 @@ public class Present : MonoBehaviour
         if (roll <= spawnChances[health - 1].x)
         {
             // Coal
+            Present coalTemp = Instantiate(coalPrefab, transform.position + Vector3.up * 0.5f, Quaternion.identity);
+            FindAnyObjectByType<GridManager>().AddObjectToGrid(gridPosition.x, gridPosition.y, coalTemp.gameObject);
         }
         else if (roll <= spawnChances[health - 1].x + spawnChances[health - 1].y)
         {
             // Spawn common card
             int index = Random.Range(0, commonCard.Length);
+
+            SpriteRenderer wonCard = Instantiate(wonCardPrefab, transform.position + Vector3.up * 3f, Quaternion.identity);
+
+            wonCard.gameObject.SetActive(true);
+            wonCard.sprite = commonCard[index].CardImage;
             playerController.AddCardToDeck(commonCard[index]);
         }
         else
         {
             int index = Random.Range(0, godCards.Length);
+
+            SpriteRenderer wonCard = Instantiate(wonCardPrefab, transform.position + Vector3.up * 3f, Quaternion.identity);
+
+            wonCard.gameObject.SetActive(true);
+            wonCard.sprite = godCards[index].CardImage;
             playerController.AddCardToDeck(godCards[index]);
         }
+    }
+
+    public void PushPositionDown()
+    {
+        gridPosition.y += 1;
     }
 
     public void BlowUpPresent()
     {
         transform.DOScale(Vector3.zero, 0.3f).SetEase(Ease.InBack).OnComplete(() =>
         {
+            GridManager gridManager = FindAnyObjectByType<GridManager>();
+            gridManager.AddObjectToGrid(gridPosition.x, gridPosition.y, null);
             Destroy(gameObject);
         });
     }

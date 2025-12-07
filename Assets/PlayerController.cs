@@ -71,6 +71,7 @@ public class PlayerController : MonoBehaviour
     public void StartTurn()
     {
         currentEnergy = energyPerTurn;
+        ShuffleDeck();
         UpdateUICost();
         ClearHand();
         DrawCards(drawPerTurn);
@@ -377,6 +378,9 @@ public class PlayerController : MonoBehaviour
         {
             ActivateDoubleCast(currentlyDraggedCard);
         }
+
+        if(currentlyDraggedCard.GlobalPower == true)
+            gridManager.TurnOffFirstRowIndicator();
 
         currentEnergy -= currentlyDraggedCard.Cost;
         UpdateUICost();
