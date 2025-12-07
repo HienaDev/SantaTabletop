@@ -266,7 +266,7 @@ MonoBehaviour:
     Drop a massive scope onto the battlefield
     damaging all presents and stunning Wilson'
   placed: 0
-  GlobalPower: 1
+  GlobalPower: 0
   elfBulletPrefab: {fileID: 6681176455617849547, guid: adc46c4fce935e54fbbe90dc924d83b3, type: 3}
 --- !u!1 &512195169623378959
 GameObject:
