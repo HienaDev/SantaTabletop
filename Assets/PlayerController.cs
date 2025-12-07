@@ -58,13 +58,15 @@ public class PlayerController : MonoBehaviour
 
     public bool KingOfElvesBuff = false; //Elfs deal double damage and cost 0
 
+    [SerializeField] private GameObject gingerBreadPrefab;
+    private List<GameObject> gingerBreads = new List<GameObject>();
+    [SerializeField] private Transform gingerbreadSpawnPosition;
+
     private void Start()
     {
         handOriginalPosition = handParent.position;
         currentlyDraggedCard = null;
         deck = new List<Card>(initialDeck);
-
-        currentEnergy = energyPerTurn;
 
         gridManager = FindAnyObjectByType<GridManager>();
 
@@ -73,7 +75,7 @@ public class PlayerController : MonoBehaviour
 
     public void StartTurn()
     {
-        currentEnergy = energyPerTurn;
+        AddEnergy(energyPerTurn);
         ShuffleDeck();
         UpdateUICost();
         ClearHand();
@@ -408,6 +410,18 @@ public class PlayerController : MonoBehaviour
             gridManager.TurnOffFirstRowIndicator();
 
         currentEnergy -= currentlyDraggedCard.Cost;
+
+        for (int i = 0; i < currentlyDraggedCard.Cost; i++)
+        {
+            GameObject gingerBread = gingerBreads[0];
+            gingerBread.transform.DOScale(Vector3.zero, 0.3f).SetEase(Ease.InBack)
+                .OnComplete(() =>
+            {
+                Destroy(gingerBread);
+            });
+            gingerBreads.RemoveAt(0);
+        }
+
         UpdateUICost();
     }
 
@@ -415,12 +429,28 @@ public class PlayerController : MonoBehaviour
     {
         currentEnergy += amount;
 
+        StartCoroutine(AddGingerbreadCoroutine(amount));
+
         UpdateUICost();
+    }
+
+    private IEnumerator AddGingerbreadCoroutine(int amount)
+    {
+        for (int i = 0; i < amount; i++)
+        {
+            GameObject gingerbread = Instantiate(gingerBreadPrefab, gingerbreadSpawnPosition.position, Quaternion.identity);
+            gingerbread.transform.rotation = Random.rotation;
+            gingerBreads.Add(gingerbread);
+
+            yield return new WaitForSeconds(0.2f);
+        }
     }
 
     private void UpdateUICost()
     {
         energyText.text = currentEnergy.ToString() + "/" + energyPerTurn;
+        
+        
     }
 
     public void ReturnToPosition(Vector3 targetPosition)
@@ -516,7 +546,7 @@ public class PlayerController : MonoBehaviour
             card.DestroyCard();
         }
 
-        ArrangeCardsInHand();
+        
     }
 
     public void ClearHand()
