@@ -20,7 +20,7 @@ public class ElfBullet : Bullet
 
         GameObject objAtTarget = gridManager.GetObjectAtPosition(targetPos.x, targetPos.y);
 
-        transform.DOMove(gridManager.ConvertPosition(targetPos.x, targetPos.y), 0.3f).SetEase(Ease.Linear).OnComplete(() =>
+        transform.DOMove(gridManager.ConvertPosition(targetPos.x, targetPos.y), 0.25f).SetEase(Ease.Linear).OnComplete(() =>
         {
             currentPosition = targetPos;
 
