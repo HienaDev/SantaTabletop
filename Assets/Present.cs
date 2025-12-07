@@ -15,10 +15,9 @@ public class Present : MonoBehaviour
 
     private Vector3 originalScale;
 
-    [SerializeField] private Card[] commonCard;
-    [SerializeField] private Card[] godCards;
+    [SerializeField] private Card[] cards;
 
-    [SerializeField] private Vector3[] spawnChances;
+    [SerializeField] private Vector2[] spawnChances;
 
     private PlayerController playerController;
 
@@ -102,32 +101,28 @@ public class Present : MonoBehaviour
             spawnedCoal = true;
             FindAnyObjectByType<GridManager>().AddObjectToGrid(gridPosition.x, gridPosition.y, coalTemp.gameObject);
         }
-        else if (roll <= spawnChances[health - 1].x + spawnChances[health - 1].y)
-        {
-            // Spawn common card
-            int index = Random.Range(0, commonCard.Length);
-
-            SpriteRenderer wonCard = Instantiate(wonCardPrefab, transform.position + Vector3.up * 3f, Quaternion.identity);
-
-            wonCard.gameObject.SetActive(true);
-            wonCard.sprite = commonCard[index].CardImage;
-            playerController.AddCardToDeck(commonCard[index]);
-        }
         else
         {
-            int index = Random.Range(0, godCards.Length);
+            // Spawn common card
+            int index = Random.Range(0, cards.Length);
 
             SpriteRenderer wonCard = Instantiate(wonCardPrefab, transform.position + Vector3.up * 3f, Quaternion.identity);
 
             wonCard.gameObject.SetActive(true);
-            wonCard.sprite = godCards[index].CardImage;
-            playerController.AddCardToDeck(godCards[index]);
+            wonCard.sprite = cards[index].CardImage;
+            playerController.AddCardToDeck(cards[index]);
         }
+
     }
 
     public void PushPositionDown()
     {
         gridPosition.y += 1;
+    }
+
+    public void PushPositionUp()
+    {
+        gridPosition.y -= 1;
     }
 
     public void BlowUpPresent()

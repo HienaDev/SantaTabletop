@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8541029687729587282}
   - component: {fileID: 662217708815940752}
   - component: {fileID: 2996146903410798664}
+  - component: {fileID: -1431790428463083135}
   m_Layer: 0
   m_Name: Pop Up Card
   m_TagString: Untagged
@@ -115,6 +116,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1eec467951d1dd24f9d2b8683db465d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fastSpeed: 1080
-  duration: 1.5
+  initialSpeed: 1080
   finalSpeed: 90
+  slowDownDuration: 1.5
+  totalDegreesBeforeDestroy: 720
+--- !u!114 &-1431790428463083135
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5048759003099752202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da7bd18638b922a4cb0c9d31678421db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onStartOnly: 1

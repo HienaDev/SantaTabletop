@@ -33,4 +33,17 @@ public class PopUpOnEnable : MonoBehaviour
         transform.DOScale(originalScale, duration)
             .SetEase(easeType);
     }
+
+    public void PopUp()
+    {
+        // Stop any previous tweens on this transform to prevent conflicts.
+        transform.DOKill(true);
+
+        // Set the initial scale to zero, just in case.
+        transform.localScale = Vector3.zero;
+
+        // Start the tween: scale from zero to the stored original scale.
+        transform.DOScale(originalScale, duration)
+            .SetEase(easeType);
+    }
 }

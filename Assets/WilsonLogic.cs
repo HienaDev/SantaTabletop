@@ -50,9 +50,19 @@ public class WilsonLogic : MonoBehaviour
         isStunned = true;
     }
 
-    public bool Shoot()
+    public bool Shoot(bool countDown = true)
     {
         int bulletChoice = Random.Range(0, currentShots);
+
+
+        if(countDown)
+        {
+            Debug.Log("Shot because of countdown");
+        }
+        else
+        {
+            Debug.Log("Shot because presents destroyed");
+        }
 
         if (bulletChoice == 0)
         {

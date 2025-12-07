@@ -105,6 +105,43 @@ public class GridManager : MonoBehaviour
         }
     }
 
+    public void PushPresentCollumn(int column)
+    {
+        // 1. Destroy the top object if it exists (y = 0)
+        GameObject topObj = gridArray[column, 0];
+        if (topObj != null)
+        {
+            topObj.transform.DOMoveY(
+                topObj.transform.position.y + 2f,
+                0.5f
+            )
+            .SetEase(Ease.InOutSine)
+            .OnComplete(() => Destroy(topObj));
+        }
+
+        // 2. Shift everything UP
+
+        for (int y = 0; y < gridSize.y - 1; y++)
+        {
+            gridArray[column, y] = gridArray[column, y + 1];
+
+            GameObject obj = gridArray[column, y];
+            if (obj != null)
+            {
+                obj.transform.DOMove(
+                    ConvertPosition(column, y, presentHeight),
+                    0.2f
+                ).SetEase(Ease.InOutSine);
+
+                if (obj.TryGetComponent(out Present present))
+                    present.PushPositionUp();
+            }
+        }
+
+        // 3. Clear the bottom cell
+        gridArray[column, gridSize.y - 1] = null;
+    }
+
     public void SpawnNewRow()
     {
         StartCoroutine(SpawnNewRowCR());
@@ -291,24 +328,51 @@ public class GridManager : MonoBehaviour
 
     private void MoveAllObjectsDown()
     {
+        bool presentsDestryoed = false;
+
         for (int x = 0; x < gridSize.x; x++)
         {
+            // 1. HANDLE THE BOTTOM ROW BEFORE SHIFTING
+            GameObject bottomObj = gridArray[x, gridSize.y - 1];
+            if (bottomObj != null)
+            {
+                // Animate falling out of the grid
+                bottomObj.transform.DOMoveY(
+                    bottomObj.transform.position.y - 10f, 0.6f
+                )
+                .SetEase(Ease.InOutSine)
+                .OnComplete(() => Destroy(bottomObj));
+
+                presentsDestryoed = true;
+            }
+
+            // 2. SHIFT EVERYTHING DOWN
             for (int y = gridSize.y - 1; y > 0; y--)
             {
                 gridArray[x, y] = gridArray[x, y - 1];
+
                 if (gridArray[x, y] != null)
                 {
-                    gridArray[x, y].transform.DOMove(ConvertPosition(x, y, presentHeight), 0.2f).SetEase(Ease.InOutSine);
+                    gridArray[x, y].transform.DOMove(
+                        ConvertPosition(x, y, presentHeight),
+                        0.2f
+                    ).SetEase(Ease.InOutSine);
 
-                    if(gridArray[x, y].TryGetComponent<Present>(out Present present))
-                    {
+                    if (gridArray[x, y].TryGetComponent(out Present present))
                         present.PushPositionDown();
-                    }
                 }
             }
+
+            // 3. CLEAR THE TOP CELL
             gridArray[x, 0] = null;
         }
+
+        if(presentsDestryoed)
+        {
+            wilsonLogic.Shoot(false);
+        }
     }
+
 
     private void ClearGrid()
     {

@@ -1834,6 +1834,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da7bd18638b922a4cb0c9d31678421db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  onStartOnly: 0
 --- !u!4 &314187304 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 290ee5736a8f35744bd9a72cc33d8d52, type: 3}
@@ -2237,14 +2238,15 @@ MonoBehaviour:
   - {fileID: 6792461178538579350, guid: e83a86e46f6e9c64285da7b1eec3babb, type: 3}
   - {fileID: 6792461178538579350, guid: e83a86e46f6e9c64285da7b1eec3babb, type: 3}
   - {fileID: 6792461178538579350, guid: e83a86e46f6e9c64285da7b1eec3babb, type: 3}
-  - {fileID: 3374310435707573499, guid: e8b445f56bcf40f40a3b6f5aaa8a2d27, type: 3}
-  - {fileID: 4157371717402085253, guid: e257ebe719b61e8418848dfd75e89cc9, type: 3}
-  - {fileID: 8301528737591261173, guid: 4228bf06822a5e343828065e4bddf061, type: 3}
+  - {fileID: 5229304816984075049, guid: cfce173941ad0c34bb8f1ed25548e623, type: 3}
+  - {fileID: 6792461178538579350, guid: e83a86e46f6e9c64285da7b1eec3babb, type: 3}
+  - {fileID: 682586006747085852, guid: e2222fb8ec3fd1d43bab76c8241a823e, type: 3}
   distanceToPlayCard: 0.5
   energyPerTurn: 3
   energyText: {fileID: 1081103484}
   endTurnButton: {fileID: 635683723}
   DoubleCastActive: 0
+  KingOfElvesBuff: 0
 --- !u!4 &354906234 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 290ee5736a8f35744bd9a72cc33d8d52, type: 3}
@@ -3631,6 +3633,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1144298506}
+        m_TargetAssemblyTypeName: WilsonLogic, Assembly-CSharp
+        m_MethodName: CountShotDown
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 635683723}
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
@@ -4464,6 +4478,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da7bd18638b922a4cb0c9d31678421db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  onStartOnly: 0
 --- !u!212 &864945702
 SpriteRenderer:
   m_ObjectHideFlags: 0

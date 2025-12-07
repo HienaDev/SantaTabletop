@@ -9,9 +9,8 @@ public class DiogoAndradeCard : Card
     {
 
         TAG_Cat cat = FindAnyObjectByType<TAG_Cat>();
-        Debug.Log("Cat found: " + cat);
 
-        SpriteRenderer[] catSprites = cat.GetComponentsInChildren<SpriteRenderer>();
+        cat.FlashSequence();
 
         foreach (GameObject obj in gridManager.GridArray)
         {
@@ -22,28 +21,11 @@ public class DiogoAndradeCard : Card
             }
         }
 
-        StartCoroutine(FlashSequence(cat, catSprites));
+
 
     }
 
-    private IEnumerator FlashSequence(TAG_Cat cat, SpriteRenderer[] catSprites)
-    {
-        cat.gameObject.SetActive(false);
 
-        yield return new WaitForSeconds(0.02f);
-
-        cat.gameObject.SetActive(true);
-
-        foreach (SpriteRenderer sprite in catSprites)
-        {
-            sprite.enabled = true;
-            sprite.DOColor(Color.cyan, 0.15f).SetLoops(15, LoopType.Yoyo).OnComplete(() =>
-            {
-                sprite.enabled = false;
-
-            });
-        }
-    }
 
 
 }

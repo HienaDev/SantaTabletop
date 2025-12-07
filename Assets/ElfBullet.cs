@@ -30,6 +30,11 @@ public class ElfBullet : Bullet
                 {
                     int currentPresentHealth = present.DamagePresent();
 
+                    if (FindAnyObjectByType<PlayerController>().KingOfElvesBuff && currentPresentHealth > 0)
+                    {
+                        present.DamagePresent();
+                    }
+
                     BlowBulletUp();
 
                     return;

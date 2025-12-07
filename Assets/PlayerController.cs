@@ -55,6 +55,8 @@ public class PlayerController : MonoBehaviour
 
     public bool DoubleCastActive = false;
 
+    public bool KingOfElvesBuff = false; //Elfs deal double damage and cost 0
+
     private void Start()
     {
         handOriginalPosition = handParent.position;
@@ -81,7 +83,21 @@ public class PlayerController : MonoBehaviour
     public void EndTurn()
     {
         ClearHand();
+        KingOfElvesBuff = false;
+    }
 
+    public void BuffAllElfCards()
+    {
+        KingOfElvesBuff = true;
+        List<Card> elfCards = new List<Card>();
+        foreach (Card card in playerHand)
+        {
+            if (card is ElfCard)
+            {
+                card.UpdateCost(0);
+            }
+        }
+        
     }
 
     public void DrawCards(int numberOfCards)
@@ -386,6 +402,13 @@ public class PlayerController : MonoBehaviour
         UpdateUICost();
     }
 
+    public void AddEnergy(int amount)
+    {
+        currentEnergy += amount;
+
+        UpdateUICost();
+    }
+
     private void UpdateUICost()
     {
         energyText.text = currentEnergy.ToString() + "/" + energyPerTurn;
@@ -455,6 +478,12 @@ public class PlayerController : MonoBehaviour
     {
         Card newCard = Instantiate(card, centerCardPosition.position, Quaternion.identity);
         newCard.transform.parent = handParent;
+
+        if(newCard is ElfCard elfCard && KingOfElvesBuff)
+        {
+            elfCard.UpdateCost(0);
+        }
+
         playerHand.Add(newCard);
     }
 

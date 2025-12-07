@@ -73,6 +73,11 @@ public class Card : MonoBehaviour
         // Implement card effect here
     }
 
+    public virtual void UpdateCost(int newCost)
+    {
+        cost = 0;
+        GetComponentInChildren<CardDescription>().SetCardDescription(newCost, cardImage, cardName, description);
+    }
     public virtual void HideCard(bool hide)
     {
         placed = false;
