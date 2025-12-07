@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using TMPro;
 using System.Collections;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -62,6 +63,10 @@ public class PlayerController : MonoBehaviour
     private List<GameObject> gingerBreads = new List<GameObject>();
     [SerializeField] private Transform gingerbreadSpawnPosition;
 
+    private bool bellHovered = false;
+
+    public bool turnHappening = false;
+
     private void Start()
     {
         handOriginalPosition = handParent.position;
@@ -75,6 +80,8 @@ public class PlayerController : MonoBehaviour
 
     public void StartTurn()
     {
+        turnHappening = true;
+        RemoveEnergy(currentEnergy, true);
         AddEnergy(energyPerTurn);
         ShuffleDeck();
         UpdateUICost();
@@ -87,6 +94,7 @@ public class PlayerController : MonoBehaviour
     {
         ClearHand();
         KingOfElvesBuff = false;
+        turnHappening = false;
     }
 
     public void BuffAllElfCards()
@@ -242,6 +250,11 @@ public class PlayerController : MonoBehaviour
             {
                 currentlyDraggedCard = currentlyHoveredCard;
                 draggedStartSpawnPosition = currentlyDraggedCard.transform.position;
+            }
+
+            if(bellHovered && turnHappening)
+            {
+                endTurnButton.GetComponent<Button>().onClick.Invoke();
             }
         }
 
@@ -409,20 +422,49 @@ public class PlayerController : MonoBehaviour
         if(currentlyDraggedCard.GlobalPower == true)
             gridManager.TurnOffFirstRowIndicator();
 
-        currentEnergy -= currentlyDraggedCard.Cost;
+        
 
-        for (int i = 0; i < currentlyDraggedCard.Cost; i++)
-        {
-            GameObject gingerBread = gingerBreads[0];
-            gingerBread.transform.DOScale(Vector3.zero, 0.3f).SetEase(Ease.InBack)
-                .OnComplete(() =>
-            {
-                Destroy(gingerBread);
-            });
-            gingerBreads.RemoveAt(0);
-        }
+        RemoveEnergy(currentlyDraggedCard.Cost);
 
         UpdateUICost();
+    }
+
+    private void RemoveEnergy(int amount, bool all = false)
+    {
+
+        currentEnergy -= amount;
+
+        if (amount == 0 || gingerBreads.Count <= 0)
+            return;
+
+        if(all)
+        {
+            currentEnergy = 0;
+
+            for (int i = gingerBreads.Count - 1; i >= 0; i--)
+            {
+                GameObject gingerBread = gingerBreads[i];
+   
+                        Destroy(gingerBread);
+                    
+                gingerBreads.RemoveAt(i);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < amount; i++)
+            {
+
+                GameObject gingerBread = gingerBreads[0];
+                gingerBread.transform.DOScale(Vector3.zero, 0.3f).SetEase(Ease.InBack)
+                    .OnComplete(() =>
+                    {
+                        Destroy(gingerBread);
+                    });
+                gingerBreads.RemoveAt(0);
+            }
+        }
+
     }
 
     public void AddEnergy(int amount)
@@ -436,6 +478,7 @@ public class PlayerController : MonoBehaviour
 
     private IEnumerator AddGingerbreadCoroutine(int amount)
     {
+        Debug.Log(amount + " gingerbreads to add.");
         for (int i = 0; i < amount; i++)
         {
             GameObject gingerbread = Instantiate(gingerBreadPrefab, gingerbreadSpawnPosition.position, Quaternion.identity);
@@ -489,6 +532,16 @@ public class PlayerController : MonoBehaviour
                 }
 
             }
+            else if(currentlyHoveredCard == null)
+            {
+                if(hoveredObject.TryGetComponent<EndTurnBell>(out EndTurnBell bell))
+                {
+                    bell.EnterHover();
+                    bellHovered = true;
+                }
+            }
+
+        
     }
 
     /// <summary>
@@ -503,6 +556,14 @@ public class PlayerController : MonoBehaviour
             {
                 currentlyHoveredCard = null;
                 card.ExitHover();
+            }
+        }
+        if (bellHovered)
+        {
+            if (unhoveredObject.TryGetComponent<EndTurnBell>(out EndTurnBell bell))
+            {
+                bell.ExitHover();
+                bellHovered = false;
             }
         }
     }
