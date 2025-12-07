@@ -46,6 +46,11 @@ public class GridManager : MonoBehaviour
 
     public bool fachadaDebuff = false;
 
+
+    [SerializeField] private GameObject santaDied;
+
+    [SerializeField] private GameObject santaSaved;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -501,10 +506,12 @@ public class GridManager : MonoBehaviour
         if(win)
         {
             Debug.Log("You Win!");
+            santaSaved.SetActive(true);
         }
         else
         {
             Debug.Log("You Lose!");
+            santaDied.SetActive(true);
         }
     }
 

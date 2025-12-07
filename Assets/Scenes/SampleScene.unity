@@ -1016,7 +1016,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Santa DIED
+  m_text: 'Santa DIED
+
+
+    Press R to restart'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 758dbda4009be5d4abb56269a402dc37, type: 2}
   m_sharedMaterial: {fileID: -2745242680291169009, guid: 758dbda4009be5d4abb56269a402dc37, type: 2}
@@ -2021,6 +2024,8 @@ MonoBehaviour:
   - {x: 0.3, y: 0.4, z: 0.3}
   - {x: 0.2, y: 0.4, z: 0.4}
   fachadaDebuff: 0
+  santaDied: {fileID: 1590978340}
+  santaSaved: {fileID: 2062673639}
 --- !u!1001 &167525370
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11890,7 +11895,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: NOEL IS SAVED
+  m_text: 'NOEL IS SAVED
+
+
+    Press R to restart'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 758dbda4009be5d4abb56269a402dc37, type: 2}
   m_sharedMaterial: {fileID: -2745242680291169009, guid: 758dbda4009be5d4abb56269a402dc37, type: 2}
@@ -14639,6 +14647,7 @@ GameObject:
   - component: {fileID: 1590978341}
   - component: {fileID: 1590978343}
   - component: {fileID: 1590978342}
+  - component: {fileID: 1590978344}
   m_Layer: 5
   m_Name: Santa died
   m_TagString: Untagged
@@ -14704,6 +14713,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1590978340}
   m_CullTransparentMesh: 1
+--- !u!114 &1590978344
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1590978340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3fcf384e711c62429cb61e9c3058ec3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1591507280 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 290ee5736a8f35744bd9a72cc33d8d52, type: 3}
@@ -17089,6 +17110,7 @@ GameObject:
   - component: {fileID: 2062673640}
   - component: {fileID: 2062673642}
   - component: {fileID: 2062673641}
+  - component: {fileID: 2062673643}
   m_Layer: 5
   m_Name: Santa saved
   m_TagString: Untagged
@@ -17154,6 +17176,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2062673639}
   m_CullTransparentMesh: 1
+--- !u!114 &2062673643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2062673639}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3fcf384e711c62429cb61e9c3058ec3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2105908632
 PrefabInstance:
   m_ObjectHideFlags: 0

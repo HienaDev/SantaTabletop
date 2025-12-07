@@ -26,6 +26,7 @@ public class WilsonLogic : MonoBehaviour
 
     [SerializeField] private Animator leverAnimator;
 
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
