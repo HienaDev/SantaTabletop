@@ -39,6 +39,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float cardZOffset = 0.5f;
 
     [SerializeField] private Card[] initialDeck;
+    [SerializeField] private Card[] customOPdeck;
     private List<Card> deck = new List<Card>();
     private int currentCardIndex = 0;
 
@@ -171,6 +172,11 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+
+        if(Input.GetKeyDown(KeyCode.T))
+        {
+            deck = new List<Card>(customOPdeck);
+        }
 
         if (currentlySelectedBullet != null || gridManager.WilsonDoingStuff)
         {
