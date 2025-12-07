@@ -3667,7 +3667,7 @@ MonoBehaviour:
   KingOfElvesBuff: 0
   gingerBreadPrefab: {fileID: 3645547839514494026, guid: b1fe1781a6af580458ac814d06dd8f02, type: 3}
   gingerbreadSpawnPosition: {fileID: 428974578}
-  turnHappening: 1
+  turnHappening: 0
 --- !u!1 &343923467 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -5568371526223589888, guid: 4c55a421cedd46f4098dd76fe46ee1d6, type: 3}
