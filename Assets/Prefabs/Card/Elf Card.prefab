@@ -1248,3 +1248,4 @@ MonoBehaviour:
   placed: 0
   GlobalPower: 0
   elfBulletPrefab: {fileID: 3209848202948774906, guid: 067a50b55b3802b42a939f7a372d5814, type: 3}
+  isActualElf: 1

@@ -105,7 +105,9 @@ public class PlayerController : MonoBehaviour
         {
             if (card is ElfCard)
             {
-                card.UpdateCost(0);
+                ElfCard elf = (ElfCard)card;
+                if (elf.isActualElf)
+                    card.UpdateCost(0);
             }
         }
         
