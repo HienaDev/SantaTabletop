@@ -699,7 +699,7 @@ MonoBehaviour:
     m_Bits: 64
   currentlySelectedBullet: {fileID: 0}
   handParent: {fileID: 671794870}
-  drawPerTurn: 3
+  drawPerTurn: 4
   cardPrefab: {fileID: 6530930242184195005, guid: c72ef84b2deaedc46a62bb01cb65cfae, type: 3}
   centerCardPosition: {fileID: 4893380700947561413}
   cardZOffset: 0.3
@@ -709,6 +709,7 @@ MonoBehaviour:
   - {fileID: 6792461178538579350, guid: e83a86e46f6e9c64285da7b1eec3babb, type: 3}
   - {fileID: 3374310435707573499, guid: e8b445f56bcf40f40a3b6f5aaa8a2d27, type: 3}
   - {fileID: 4157371717402085253, guid: e257ebe719b61e8418848dfd75e89cc9, type: 3}
+  - {fileID: 8301528737591261173, guid: 4228bf06822a5e343828065e4bddf061, type: 3}
   distanceToPlayCard: 0.5
   energyPerTurn: 3
   energyText: {fileID: 1081103484}

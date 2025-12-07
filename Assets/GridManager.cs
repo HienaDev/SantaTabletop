@@ -232,7 +232,7 @@ public class GridManager : MonoBehaviour
 
     private IEnumerator GenerateRandomPresentFirstLineCR()
     {
-        float initialChance = 0.5f;
+        float initialChance = 0.35f;
         for (int x = 0; x < gridSize.x; x++)
         {
             if (Random.value > initialChance)
