@@ -28,6 +28,8 @@ public class Present : MonoBehaviour
 
     [SerializeField] private SpriteRenderer wonCardPrefab;
 
+    private bool spawnedCoal = false;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -96,6 +98,8 @@ public class Present : MonoBehaviour
         {
             // Coal
             Present coalTemp = Instantiate(coalPrefab, transform.position + Vector3.up * 0.5f, Quaternion.identity);
+            coalTemp.Initialize(1, gridPosition);
+            spawnedCoal = true;
             FindAnyObjectByType<GridManager>().AddObjectToGrid(gridPosition.x, gridPosition.y, coalTemp.gameObject);
         }
         else if (roll <= spawnChances[health - 1].x + spawnChances[health - 1].y)
@@ -131,7 +135,10 @@ public class Present : MonoBehaviour
         transform.DOScale(Vector3.zero, 0.3f).SetEase(Ease.InBack).OnComplete(() =>
         {
             GridManager gridManager = FindAnyObjectByType<GridManager>();
-            gridManager.AddObjectToGrid(gridPosition.x, gridPosition.y, null);
+
+            if(!spawnedCoal)
+                gridManager.AddObjectToGrid(gridPosition.x, gridPosition.y, null);
+
             Destroy(gameObject);
         });
     }

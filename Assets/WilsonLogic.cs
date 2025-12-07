@@ -63,6 +63,7 @@ public class WilsonLogic : MonoBehaviour
         }
         else
         {
+            Debug.Log("Click! Wilson spared santa.");
             currentShots--; // Decrease the number of remaining shots
             return false; // Indicate that Wilson did not shoot himself
         }
