@@ -85,8 +85,8 @@ public class WilsonLogic : MonoBehaviour
 
                 if (shotCoundown < 1)
                 {
-                    if (!isStunned)
-                        Shoot();
+                    
+                    Shoot();
 
                     shotCoundown = 3;
 
@@ -109,11 +109,25 @@ public class WilsonLogic : MonoBehaviour
     public void StunWilson()
     {
         isStunned = true;
+
     }
 
     public bool Shoot(bool countDown = true, int currentCountdown = -1)
     {
         float bulletChoice = Random.value;
+
+        if(isStunned)
+        {
+            Debug.Log("Wilson is stunned and cannot shoot!");
+            shotCountdown.text = "WILSON IS STUNNED!\nSAFE FOR NOW";
+            DOVirtual.DelayedCall(2f, () =>
+            {
+                isStunned = false;
+                ReturnCamera();
+            });
+
+            return false;
+        }
 
         shotCountdown.text = "TIME TO SHOOT!";
         if (countDown)

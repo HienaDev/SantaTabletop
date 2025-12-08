@@ -11,12 +11,13 @@ public class HienaDevBullet : Bullet
     {
         // Spyglass Falling Animation
 
-        transform.eulerAngles = customInitialRotation;
+        transform.eulerAngles = customInitialRotation - Vector3.forward * 10f;
         transform.localScale = Vector3.zero;
 
         Vector3 rotationToAdd = customInitialRotation * -1f;
 
-        transform.DOScale(originalScale, 0.5f).SetEase(Ease.OutBack).OnComplete(() =>
+        transform.DORotate(customInitialRotation, 1.5f).SetEase(Ease.OutCirc);
+        transform.DOScale(originalScale, 1.5f).SetEase(Ease.OutCirc).OnComplete(() =>
         {
             transform.DORotate(rotationToAdd, 1f, RotateMode.LocalAxisAdd).SetEase(Ease.OutBounce, overshoot: 0.1f).OnComplete(() =>
             {
