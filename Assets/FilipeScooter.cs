@@ -6,15 +6,6 @@ public class FilipeScooter : Bullet
 {
     [SerializeField] private bool rightDiagonal;
 
-    // ----------------- PUBLIC: Set initial direction for placement -----------------
-    public void SetInitialDirection(bool moveRightDiagonal)
-    {
-        rightDiagonal = moveRightDiagonal;
-
-        // Initial rotation (for placement)
-        transform.rotation = Quaternion.Euler(0f, rightDiagonal ? 90f : -90f, 0f);
-    }
-
     // ----------------- MAIN BULLET MOVEMENT -----------------
     public override void MoveBullet()
     {
@@ -85,6 +76,8 @@ public class FilipeScooter : Bullet
             // Continue moving in the current direction
             MoveBullet();
         });
+
+        transform.DOLookAt(targetWorld, 0.3f);
     }
 
     public override void OnStopMoveAction()
@@ -96,6 +89,8 @@ public class FilipeScooter : Bullet
     {
         if (moving)
             return;
+
+        
 
         Vector2Int currentPos = currentPosition;
         bool currentDirection = rightDiagonal;
@@ -135,6 +130,10 @@ public class FilipeScooter : Bullet
             path.Add(nextPos);
             currentPos = nextPos;
         }
+
+
+
+        transform.LookAt(gridManager.ConvertPosition(path[1].x, path[1].y));
 
         gridManager.TurnOnPathIndicators(path);
     }

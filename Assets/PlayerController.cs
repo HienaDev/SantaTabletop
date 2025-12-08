@@ -40,6 +40,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private Card[] initialDeck;
     [SerializeField] private Card[] customOPdeck;
+    [SerializeField] private Card[] elvesDeck;
     private List<Card> deck = new List<Card>();
     private int currentCardIndex = 0;
 
@@ -68,6 +69,8 @@ public class PlayerController : MonoBehaviour
 
     public bool turnHappening = false;
 
+    private bool handHiddenToggled = false;
+
     private void Start()
     {
         handOriginalPosition = handParent.position;
@@ -81,6 +84,7 @@ public class PlayerController : MonoBehaviour
 
     public void StartTurn()
     {
+        handHiddenToggled = false;
         turnHappening = true;
         RemoveEnergy(currentEnergy, true);
         AddEnergy(energyPerTurn);
@@ -173,31 +177,45 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
 
-        if(Input.GetKeyDown(KeyCode.T))
+        if(Input.GetKeyDown(KeyCode.Tab))
+        {
+            ToggleHideHand();
+        }
+
+        if (Input.GetKeyDown(KeyCode.T))
         {
             deck = new List<Card>(customOPdeck);
         }
 
-        if (currentlySelectedBullet != null || gridManager.WilsonDoingStuff)
+        if(Input.GetKeyDown(KeyCode.Y))
         {
-            HideHand(true);
+            deck = new List<Card>(elvesDeck);
         }
-        else if (bulletMoving != null)
+
+        if(!handHiddenToggled)
         {
-            if (!bulletMoving.stoppedActing)
+            if (currentlySelectedBullet != null || gridManager.WilsonDoingStuff)
             {
                 HideHand(true);
             }
+            else if (bulletMoving != null)
+            {
+                if (!bulletMoving.stoppedActing)
+                {
+                    HideHand(true);
+                }
+                else
+                {
+                    bulletMoving = null;
+                    HideHand(false);
+                }
+            }
             else
             {
-                bulletMoving = null;
                 HideHand(false);
             }
         }
-        else
-        {
-            HideHand(false);
-        }
+
 
         // 1. Create a ray from the camera through the mouse position
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -220,7 +238,7 @@ public class PlayerController : MonoBehaviour
 
                 // Hover the new object
                 HandleObjectHovered(currentHitObject);
-                lastHoveredObject = currentHitObject;
+                
             }
             // If it's the SAME object, do nothing (or continue hovering logic here)
         }
@@ -356,8 +374,26 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void ToggleHideHand()
+    {
+        if (!turnHappening || currentlySelectedBullet != null)
+            return;
+
+        if(lastHoveredObject != null)
+            if (lastHoveredObject.GetComponent<Card>() != null)
+                HandleObjectUnhovered(lastHoveredObject);
+
+        if(currentlyDraggedCard != null)
+            currentlyDraggedCard = null;
+
+        Debug.Log("Toggling hand hide.");
+        handHiddenToggled = !handHiddenToggled;
+        HideHand(handHiddenToggled);
+    }
+
     private void HideHand(bool hide)
     {
+        Debug.Log("Hiding hand: " + hide);
         if (handHidden && !hide)
         {
             foreach (Card card in playerHand)
@@ -515,6 +551,15 @@ public class PlayerController : MonoBehaviour
     /// <param name="hoveredObject">The GameObject the mouse is currently over.</param>
     private void HandleObjectHovered(GameObject hoveredObject)
     {
+
+        if(!turnHappening)
+            return;
+
+        if(bulletMoving != null)
+            if(!bulletMoving.stoppedActing)
+                return;
+
+        lastHoveredObject = hoveredObject;
 
         if (currentlySelectedBullet != null && hoveredObject.TryGetComponent<IndicatorCell>(out IndicatorCell cell))
         {

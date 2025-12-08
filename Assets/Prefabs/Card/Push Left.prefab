@@ -588,9 +588,9 @@ MonoBehaviour:
   cost: 0
   cardImage: {fileID: 21300000, guid: 55b9a4c621043db4f8b7cc46586bc3cd, type: 3}
   cardName: Push Wilson Left
-  description: '"THIS ISN''T YOU WILSON":
+  description: '<b>"THIS ISN''T YOU WILSON":</b>
 
-    Push Wilson left'
+    <b>Push</b> Wilson left'
   placed: 0
   GlobalPower: 1
   left: 1
@@ -869,8 +869,8 @@ MonoBehaviour:
 
     Elf flies in a straight line'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 6177eed2806c61049b8f834d093c4610, type: 2}
-  m_sharedMaterial: {fileID: 8638304392315914961, guid: 6177eed2806c61049b8f834d093c4610, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: eba07a83c73535f419c0ffd7a50cd584, type: 2}
+  m_sharedMaterial: {fileID: -191505472148141488, guid: eba07a83c73535f419c0ffd7a50cd584, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -894,11 +894,11 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 33.7
+  m_fontSize: 23
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 18
+  m_fontSizeMin: 14
   m_fontSizeMax: 72
   m_fontStyle: 1
   m_HorizontalAlignment: 2

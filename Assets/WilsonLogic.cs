@@ -26,31 +26,64 @@ public class WilsonLogic : MonoBehaviour
 
     [SerializeField] private Animator leverAnimator;
 
+    [SerializeField] private GameObject shotInfo;
+    private Vector3 shotInfoOriginalPos;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        shotInfoOriginalPos = shotInfo.transform.position;
+
         gridManager = FindAnyObjectByType<GridManager>();
         currentShots = maxShots;
+
+        shotCountdown.text = "Countdown to SHOOT!\n";
+
+        switch (shotCoundown)
+        {
+            case 3:
+                shotCountdown.text += $"<color=white>{shotCoundown.ToString()}</color>";
+                break;
+            case 2:
+                shotCountdown.text += $"<color=yellow>{shotCoundown.ToString()}</color>";
+                break;
+            case 1:
+                shotCountdown.text += $"<color=red>{shotCoundown.ToString()}</color>";
+                break;
+        }
+
+        shotTextChance.text = $"Roll above \n<color=red>" + (1 * 100 / (currentShots)).ToString() + "</color>\n to not shoot!";
     }
 
     public void CountShotDown()
     {
+        shotInfo.transform.DOMoveY(shotInfoOriginalPos.y + 4f, 1.5f).SetEase(Ease.InOutSine);
 
         mainCam.DOMove(cameraAnchorWilsonShooting.position, 1.5f).SetEase(Ease.InOutSine);
         mainCam.DORotateQuaternion(cameraAnchorWilsonShooting.rotation, 1.5f).SetEase(Ease.InOutSine).OnComplete(() =>
         {
-            shotCountdown.gameObject.SetActive(true);
-            shotTextChance.gameObject.SetActive(true);
 
             DOVirtual.DelayedCall(1f, () =>
             {
                 shotCoundown--;
-                shotCountdown.text = "Countdown to SHOOT!\n" + shotCoundown.ToString();
+                shotCountdown.text = "Countdown to SHOOT!\n";
 
-                shotTextChance.text = $"{1}/{currentShots}\n" + (1f / currentShots * 100).ToString("F2") + "%";
+                switch (shotCoundown)
+                {
+                    case 3:
+                        shotCountdown.text += $"<color=white>{shotCoundown.ToString()}</color>";
+                        break;
+                    case 2:
+                        shotCountdown.text += $"<color=yellow>{shotCoundown.ToString()}</color>";
+                        break;
+                    case 1:
+                        shotCountdown.text += $"<color=red>{shotCoundown.ToString()}</color>";
+                        break;
+                }
 
-                if (shotCoundown <= 1)
+                shotTextChance.text = $"Roll above \n<color=red>" + (1 * 100 / (currentShots)).ToString() + "</color>\n to not shoot!";
+
+                if (shotCoundown < 1)
                 {
                     if (!isStunned)
                         Shoot();
@@ -60,7 +93,7 @@ public class WilsonLogic : MonoBehaviour
                     return;
                 }
 
-                
+
 
                 isStunned = false;
 
@@ -70,7 +103,7 @@ public class WilsonLogic : MonoBehaviour
 
         });
 
-        
+
     }
 
     public void StunWilson()
@@ -80,10 +113,10 @@ public class WilsonLogic : MonoBehaviour
 
     public bool Shoot(bool countDown = true, int currentCountdown = -1)
     {
-        int bulletChoice = Random.Range(0, currentShots);
+        float bulletChoice = Random.value;
 
-
-        if(countDown)
+        shotCountdown.text = "TIME TO SHOOT!";
+        if (countDown)
         {
             Debug.Log("Shot because of countdown");
         }
@@ -94,24 +127,45 @@ public class WilsonLogic : MonoBehaviour
 
         bool gameOver = false;
 
-        DOVirtual.DelayedCall(1f, () =>
+        DOVirtual.DelayedCall(2f, () =>
         {
-            if (bulletChoice == 0)
+            Vector3 shotTextChanceTransformOriginalPos = shotTextChance.transform.position;
+            shotTextChance.text = "Rolling...";
+            shotTextChance.transform.DOShakePosition(1.5f, 0.01f, 10, 90, false, true).SetEase(Ease.OutQuart);
+            DOVirtual.DelayedCall(2f, () =>
             {
-                Debug.Log("Bang! Wilson shot santa.");
-                currentShots = maxShots;
-                gridManager.GameOver(false);
-                gameOver = true; // Indicate that Wilson killed Santa
-            }
-            else
-            {
-                Debug.Log("Click! Wilson spared santa.");
-                currentShots--; // Decrease the number of remaining shots
-                
-                gameOver =  false; // Indicate that Wilson did not shoot himself
-            }
+                shotTextChance.transform.position = shotTextChanceTransformOriginalPos;
+                if (bulletChoice <= (1f / currentShots))
+                    shotTextChance.text = "Rolled a\n<color=red>" + ((int)(bulletChoice * 100)).ToString() + "</color>";
+                else
+                    shotTextChance.text = "Rolled a\n<color=green>" + ((int)(bulletChoice * 100)).ToString() + "</color>";
 
-            ReturnCamera(gameOver);
+                DOVirtual.DelayedCall(2f, () =>
+                    {
+                        if (bulletChoice <= (1f / currentShots))
+                        {
+                            Debug.Log("<color=red>Bang!</color> <color=red>Wilson shot santa.</color>");
+                            shotTextChance.text = "<color=yellow>BANG!</color> \n<color=red>Santa was shot!</color";
+                            currentShots = maxShots;
+                            gameOver = true; // Indicate that Wilson killed Santa
+                            DOVirtual.DelayedCall(2f, () =>
+                            {
+                                gridManager.GameOver(false);
+                            });
+                            
+                        }
+                        else
+                        {
+                            Debug.Log("Click! Wilson spared santa.");
+                            shotTextChance.text = "<color=yellow>CLICK!</color>\nSanta survives this time!";
+                            currentShots--; // Decrease the number of remaining shots
+
+                            gameOver = false; // Indicate that Wilson did not shoot himself
+                        }
+
+                        ReturnCamera(gameOver);
+                    });
+            });
         });
 
         return gameOver;
@@ -135,8 +189,7 @@ public class WilsonLogic : MonoBehaviour
                     mainCam.DOMove(cameraAnchorPlaying.position, 1.5f).SetEase(Ease.InOutSine);
                     mainCam.DORotateQuaternion(cameraAnchorPlaying.rotation, 1.5f).SetEase(Ease.InOutSine).OnComplete(() =>
                     {
-                        shotCountdown.gameObject.SetActive(false);
-                        shotTextChance.gameObject.SetActive(false);
+                        shotInfo.transform.DOMoveY(shotInfoOriginalPos.y, 0.5f).SetEase(Ease.InOutSine);
                     });
                 });
             });
