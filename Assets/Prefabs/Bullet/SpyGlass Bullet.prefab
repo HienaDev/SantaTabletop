@@ -79,7 +79,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stoppedActing: 0
-  customInitialRotation: {x: 0, y: 0, z: -80}
+  customInitialRotation: {x: 0, y: 0, z: -70}
 --- !u!1 &8158198915315965765
 GameObject:
   m_ObjectHideFlags: 0
