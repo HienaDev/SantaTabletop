@@ -716,7 +716,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e02c90a0c55f7e47b38348e05e32258, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cost: 1
+  cost: 0
   cardImage: {fileID: 21300000, guid: 5288bb16dcd03584c92d8ff124532448, type: 3}
   cardName: Push Presents
   description: '<b>"PUSH!!!":</b>
