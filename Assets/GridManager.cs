@@ -304,6 +304,12 @@ public class GridManager : MonoBehaviour
             if (fachadaDebuff)
                 continue;
 
+            if(gridArray[x,0] != null)
+            {
+                Debug.Log("Cell at column " + x + " is already occupied. Skipping present spawn.");
+                continue;
+            }
+
             if (Random.value > initialChance)
             {
                 Debug.Log("No present spawned at column " + x);
@@ -476,7 +482,7 @@ public class GridManager : MonoBehaviour
 
     public void CheckIfHitWilson(int x)
     {
-        if (x == wilsonPositionX)
+        if (x == wilsonPositionX && gridArray[x, 0] == null)
         {
             Debug.Log("Hit Wilson!");
             wilson.transform.DOPunchPosition(new Vector3(0, 0, -0.2f), 0.5f, 10, 1).OnComplete(() =>
